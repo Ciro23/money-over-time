@@ -1,32 +1,36 @@
-import matplotlib.pyplot as plt
 from datetime import datetime
-import argparse
 
 
 class MoneyOverTime:
-    file_path = "/Users/tino/Downloads/monefy-2022-10-21_09-12-11.csv"
-    date_format = "%d/%m/%Y"
+    file_path = ""
+    date_format = ""
     date_label = {
-        "value": "date",
+        "value": "",
         "index": 0,
     }
     amount_label = {
-        "value": "amount",
+        "value": "",
         "index": 0,
     }
 
-    def get_money_per_time(self):
-        try:
-            rows = self.__get_lines_of_file(self.file_path)
-        except FileNotFoundError:
-            print("No CSV file set!")
-            exit(1)
+    def __init__(self, file_path, date_format, date_label, amount_label):
+        self.file_path = file_path
 
-        try:
-            entries = self.__get_entries_per_date(rows)
-        except ValueError:
-            print("Date or amount label are not correct")
-            exit(1)
+        if date_format is None:
+            date_format = "%d/%m/%Y"
+        self.date_format = date_format
+
+        if date_label is None:
+            date_label = "date"
+        self.date_label['value'] = date_label
+
+        if amount_label is None:
+            amount_label = "amount"
+        self.amount_label['value'] = amount_label
+
+    def get_money_per_time(self):
+        rows = self.__get_lines_of_file(self.file_path)
+        entries = self.__get_entries_per_date(rows)
 
         return self.__sum_total(entries)
 
@@ -92,11 +96,3 @@ class MoneyOverTime:
             entries[date] = total
 
         return entries
-
-
-if __name__ == "__main__":
-    money = MoneyOverTime()
-    money_per_time = money.get_money_per_time()
-
-    plt.plot(money_per_time.keys(), money_per_time.values())
-    plt.show()
