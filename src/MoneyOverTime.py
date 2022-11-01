@@ -3,61 +3,61 @@ from datetime import datetime
 
 class MoneyOverTime:
     file_path = ""
-    date_format = ""
+    date_format = "%d/%m/%Y"
     date_label = {
-        "value": "",
-        "index": 0,
+        "value": "date",
+        "index": None,
     }
     amount_label = {
-        "value": "",
-        "index": 0,
+        "value": "amount",
+        "index": None,
     }
 
     def __init__(self, file_path, date_format, date_label, amount_label):
         self.file_path = file_path
 
-        if date_format is None:
-            date_format = "%d/%m/%Y"
-        self.date_format = date_format
+        if date_format is not None:
+            self.date_format = date_format
 
-        if date_label is None:
-            date_label = "date"
-        self.date_label['value'] = date_label
+        if date_label is not None:
+            self.date_label['value'] = date_label
 
-        if amount_label is None:
-            amount_label = "amount"
-        self.amount_label['value'] = amount_label
+        if amount_label is not None:
+            self.amount_label['value'] = amount_label
 
     def get_money_per_time(self):
-        rows = self.__get_lines_of_file(self.file_path)
-        entries = self.__get_entries_per_date(rows)
+        try:
+            rows = self.__get_lines_of_file()
+        except FileNotFoundError as e:
+            raise FileNotFoundError(e)
+
+        try:
+            entries = self.__get_entries_per_date(rows)
+        except ValueError as e:
+            raise ValueError(e)
 
         return self.__sum_total(entries)
 
-    def __get_lines_of_file(self, file_path):
-        with open(file_path, "r", encoding="utf-8-sig") as file:
+    def __get_lines_of_file(self):
+        with open(self.file_path, "r", encoding="utf-8-sig") as file:
             return file.readlines()
 
     def __get_row_columns(self, row):
         return row.split(",")
 
-    def __set_index_of__specific_columns(self, columns):
+    def __set_index_of_specific_columns(self, columns):
         index = 0
-        is_date_label_set = False
-        is_amount_label_set = False
 
         for column in columns:
             column = column.lower()
             if column == self.date_label['value'].lower():
-                is_date_label_set = True
                 self.date_label['index'] = index
             elif column == self.amount_label['value'].lower():
-                is_amount_label_set = True
                 self.amount_label['index'] = index
 
             index += 1
 
-        if not is_date_label_set or not is_amount_label_set:
+        if self.date_label['index'] is None or self.amount_label['index'] is None:
             raise ValueError
 
     def __get_entries_per_date(self, rows):
@@ -69,7 +69,10 @@ class MoneyOverTime:
 
             if execute_only_the_first_time:
                 execute_only_the_first_time = False
-                self.__set_index_of__specific_columns(columns)
+                try:
+                    self.__set_index_of_specific_columns(columns)
+                except ValueError as e:
+                    raise ValueError(e)
                 continue
 
             date = columns[self.date_label['index']]
