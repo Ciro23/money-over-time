@@ -32,6 +32,8 @@ class Main:
             return
 
         plt.plot(money_per_time.keys(), money_per_time.values())
+        plt.xticks(rotation = 45)
+        plt.gca().set_xticks(plt.gca().get_xticks()[::30])
         plt.show()
 
 
