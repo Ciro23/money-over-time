@@ -40,7 +40,7 @@ class MoneyOverTime:
 
     def __get_lines_of_file(self):
         with open(self.file_path, "r", encoding="utf-8-sig") as file:
-            return file.readlines()
+            return file.read().splitlines()
 
     def __get_row_columns(self, row):
         return row.split(",")
