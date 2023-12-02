@@ -19,3 +19,5 @@ using:
 ```
 python3 src/main.py --file /path/to/your/csv/file --date_label "custom date label" --date_format "%Y/%m/%d"
 ```
+## Gallery
+![Figure_1](https://github.com/Ciro23/money-over-time/assets/38884767/3e3c8e1e-1fa6-48f7-aef7-b5315f97965b)
