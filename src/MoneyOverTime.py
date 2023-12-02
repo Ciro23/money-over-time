@@ -12,8 +12,16 @@ class MoneyOverTime:
         "value": "amount",
         "index": None,
     }
+    separator = ","
 
-    def __init__(self, file_path, date_format, date_label, amount_label):
+    def __init__(
+        self,
+        file_path,
+        separator,
+        date_format,
+        date_label,
+        amount_label,
+    ):
         self.file_path = file_path
 
         if date_format is not None:
@@ -24,6 +32,9 @@ class MoneyOverTime:
 
         if amount_label is not None:
             self.amount_label['value'] = amount_label
+
+        if separator is not None:
+            self.separator = separator
 
     def get_money_per_time(self):
         try:
@@ -43,7 +54,7 @@ class MoneyOverTime:
             return file.read().splitlines()
 
     def __get_row_columns(self, row):
-        return row.split(",")
+        return row.split(self.separator)
 
     def __set_index_of_specific_columns(self, columns):
         index = 0

@@ -14,10 +14,16 @@ To show the plot graph, use:
 ```
 python3 src/main.py --file /path/to/your/csv/file
 ```
-The default label used for date and amount are "date" and "amount" respectively, but they can be customized
-using:
+The default column separator used is a comma ",".  
+The default date format used is "%d/%m/%Y".  
+The default label used for date and amount are "date" and "amount" respectively.  
+All these parameters can be customized using:
 ```
-python3 src/main.py --file /path/to/your/csv/file --date_label "custom date label" --date_format "%Y/%m/%d"
+python3 src/main.py
+    --file /path/to/your/csv/file
+    --separator ;
+    --date_label "custom date label"
+    --date_format "%Y/%m/%d"
 ```
 ## Gallery
 ![Figure_1](https://github.com/Ciro23/money-over-time/assets/38884767/3e3c8e1e-1fa6-48f7-aef7-b5315f97965b)

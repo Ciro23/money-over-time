@@ -17,6 +17,12 @@ class Main:
             help="CSV containing all transactions path"
         )
         self.parser.add_argument(
+            "--separator",
+            type=str,
+            nargs="?",
+            help="Column separator, default \",\""
+        )
+        self.parser.add_argument(
             "--date_format",
             type=str,
             nargs="?",
@@ -36,7 +42,13 @@ class Main:
         )
 
     def execute_program(self):
-        money = MoneyOverTime(self.args.file, self.args.date_format, self.args.date_label, self.args.amount_label)
+        money = MoneyOverTime(
+            self.args.file,
+            self.args.separator,
+            self.args.date_format,
+            self.args.date_label,
+            self.args.amount_label,
+        )
 
         try:
             money_per_time = money.get_money_per_time()
@@ -44,7 +56,7 @@ class Main:
             print("File not found!")
             return
         except ValueError as e:
-            print("Date or amount label are not correct!", e)
+            print("Error reading the file, check if parameters are correct, use --help for more.", e)
             return
 
         plt.plot(money_per_time.keys(), money_per_time.values())
