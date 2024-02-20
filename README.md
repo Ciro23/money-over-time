@@ -1,6 +1,7 @@
 Displays a plot graph representing an amount of money over time.
 
 ## Building
+This program is compatible and tested with Python 3.10.  
 Install all pip dependencies using:
 ```
 pip install -r requirements.txt

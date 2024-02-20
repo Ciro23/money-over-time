@@ -42,8 +42,13 @@ class Main:
         )
 
     def execute_program(self):
+        file = self.args.file
+        if file is None:
+            print("A file path is required. Use --help")
+            return
+
         money = MoneyOverTime(
-            self.args.file,
+            file,
             self.args.separator,
             self.args.date_format,
             self.args.date_label,
@@ -51,16 +56,16 @@ class Main:
         )
 
         try:
-            money_per_time = money.get_money_per_time()
+            money_per_time: dict = money.get_money_per_time()
         except FileNotFoundError:
             print("File not found!")
             return
         except ValueError as e:
-            print("Error reading the file, check if parameters are correct, use --help for more.", e)
+            print("Error reading the file, check if parameters are correct, use --help for more.")
             return
 
         plt.plot(money_per_time.keys(), money_per_time.values())
-        plt.xticks(rotation = 45)
+        plt.xticks(rotation=45)
         plt.gca().set_xticks(plt.gca().get_xticks()[::30])
         plt.show()
 
