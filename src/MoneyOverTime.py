@@ -14,6 +14,16 @@ class MoneyOverTime:
     }
     separator: str = ","
 
+    """
+    It's possible to filter out some movements based on
+    the value of a specifiable column.
+    """
+    skip_label: dict = {
+        "value": "",
+        "index": -1,
+        "match": "",  # All movements matching this string are filtered out.
+    }
+
     def __init__(
             self,
             file_path,
@@ -21,6 +31,8 @@ class MoneyOverTime:
             date_format,
             date_label,
             amount_label,
+            skip_label,
+            skip_value,
     ):
         self.file_path = file_path
 
@@ -36,11 +48,18 @@ class MoneyOverTime:
         if separator is not None:
             self.separator = separator
 
+        if skip_label is not None:
+            self.skip_label['value'] = skip_label
+
+        if skip_value is not None:
+            self.skip_label['match'] = skip_value
+
     """
     Reads all the movements in the specified file and returns a dict
     with the date of the movement as the key and the sum of the amount
     of all movements, for that day, as the value.
     """
+
     def get_money_per_time(self) -> dict:
         try:
             rows: list = self.__get_lines_of_file()
@@ -65,6 +84,7 @@ class MoneyOverTime:
     It's necessary to retrieve the index of the "amount" and "date"
     columns from their label. This method is case-insensitive.
     """
+
     def __set_index_of_specific_columns(self, columns: list) -> None:
         index = 0
 
@@ -74,6 +94,8 @@ class MoneyOverTime:
                 self.date_label['index'] = index
             elif column == self.amount_label['value'].lower():
                 self.amount_label['index'] = index
+            elif column == self.skip_label['value'].lower():
+                self.skip_label['index'] = index
 
             index += 1
 
@@ -96,6 +118,14 @@ class MoneyOverTime:
                     raise ValueError(e)
                 continue
 
+            # If the index of the "column to skip" has been set,
+            # then the value in the cell of this row must be checked,
+            # so that it's skipped if there's a match.
+            if self.skip_label['index'] >= 0:
+                skip: str = columns[self.skip_label['index']]
+                if skip.lower() == self.skip_label['match'].lower():
+                    continue
+
             date = columns[self.date_label['index']]
             amount = columns[self.amount_label['index']]
 
@@ -110,6 +140,7 @@ class MoneyOverTime:
     All movements must be sorted chronologically by the
     date they were made.
     """
+
     def __sort_by_date_keys(self, dictionary: dict) -> dict:
         return dict(
             sorted(
@@ -123,6 +154,7 @@ class MoneyOverTime:
     together as keys and the amount of each one is summed
     as the value.
     """
+
     def __sum_total(self, entries: dict) -> dict:
         total = 0
         for date, amount in entries.items():

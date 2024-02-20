@@ -31,5 +31,15 @@ python3 src/main.py
     --date_label "custom date label"
     --date_format "%Y/%m/%d"
 ```
+It's also possible to filter out some movements based on the value of a specific column.
+For example, if the CSV file contains a column named "account" and you want to filter out
+all the rows which account is "debit card", you can use:
+```
+python3 src/main.py
+    --file "/path/to/your/csv/file"
+    --skip_label "account"
+    --skip_value "debit card"
+```
+All string parameters for column labels are handled in a case-insensitive manner.
 ## Gallery
 ![Figure_1](https://github.com/Ciro23/money-over-time/assets/38884767/3e3c8e1e-1fa6-48f7-aef7-b5315f97965b)

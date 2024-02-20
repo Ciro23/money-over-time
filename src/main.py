@@ -40,6 +40,19 @@ class Main:
             nargs="?",
             help="Amount label used in the CSV file, default \"amount\""
         )
+        self.parser.add_argument(
+            "--skip_label",
+            type=str,
+            nargs="?",
+            help="The label of the column used to filter out some movements"
+        )
+        self.parser.add_argument(
+            "--skip_value",
+            type=str,
+            nargs="?",
+            help="Based on the column label specified with \"--skip_label\", all"
+                 " rows which cell matches this value are not considered"
+        )
 
     def execute_program(self):
         file = self.args.file
@@ -53,6 +66,8 @@ class Main:
             self.args.date_format,
             self.args.date_label,
             self.args.amount_label,
+            self.args.skip_label,
+            self.args.skip_value,
         )
 
         try:
