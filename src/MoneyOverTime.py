@@ -1,58 +1,34 @@
 from datetime import datetime
+from typing import Optional
 
 
 class MoneyOverTime:
-    file_path: str = ""
-    date: dict = {
-        "label": "date",
-        "format": "%d/%m/%Y",
-        "index": -1,
-    }
-    amount_label: dict = {
-        "value": "amount",
-        "index": -1,
-    }
-    separator: str = ","
-
-    """
-    It's possible to filter out some movements based on
-    the value of a specifiable column.
-    """
-    skip_label: dict = {
-        "value": "",
-        "index": -1,
-        "match": "",  # All movements matching this string are filtered out.
-    }
-
     def __init__(
             self,
-            file_path,
-            separator=None,
-            date_format=None,
-            date_label=None,
-            amount_label=None,
-            skip_label=None,
-            skip_value=None,
+            file_path: str,
+            separator: Optional[str] = ",",
+            date_format: Optional[str] = "%d/%m/%Y",
+            date_label: Optional[str] = "date",
+            amount_label: Optional[str] = "amount",
+            skip_label: Optional[str] = None,
+            skip_value: Optional[str] = None,
     ):
         self.file_path = file_path
-
-        if date_format is not None:
-            self.date['format'] = date_format
-
-        if date_label is not None:
-            self.date['label'] = date_label
-
-        if amount_label is not None:
-            self.amount_label['value'] = amount_label
-
-        if separator is not None:
-            self.separator = separator
-
-        if skip_label is not None:
-            self.skip_label['value'] = skip_label
-
-        if skip_value is not None:
-            self.skip_label['match'] = skip_value
+        self.separator = separator if separator is not None else ","
+        self.date = {
+            "label": date_label if date_label is not None else "date",
+            "format": date_format if date_format is not None else "%d/%m/%Y",
+            "index": -1,
+        }
+        self.amount = {
+            "label": amount_label if amount_label is not None else "amount",
+            "index": -1,
+        }
+        self.skip_label = {
+            "value": skip_label if skip_label is not None else "",
+            "index": -1,
+            "match": skip_value if skip_value is not None else "",
+        }
 
     """
     Reads all the movements in the specified file and returns a dict
@@ -90,14 +66,14 @@ class MoneyOverTime:
             column = column.lower()
             if column == self.date['label'].lower():
                 self.date['index'] = index
-            elif column == self.amount_label['value'].lower():
-                self.amount_label['index'] = index
+            elif column == self.amount['label'].lower():
+                self.amount['index'] = index
             elif column == self.skip_label['value'].lower():
                 self.skip_label['index'] = index
 
             index += 1
 
-        if self.date['index'] < 0 or self.amount_label['index'] < 0:
+        if self.date['index'] < 0 or self.amount['index'] < 0:
             raise ValueError("Could not find the index of the 'date' or 'amount' labels."
                              " Check if their specified label name match the ones in the csv file.")
 
@@ -125,7 +101,7 @@ class MoneyOverTime:
                     continue
 
             date = columns[self.date['index']]
-            amount = columns[self.amount_label['index']]
+            amount = columns[self.amount['index']]
 
             if date in amount_per_date:
                 amount_per_date[date] += float(amount)
