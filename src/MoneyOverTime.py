@@ -27,12 +27,12 @@ class MoneyOverTime:
     def __init__(
             self,
             file_path,
-            separator,
-            date_format,
-            date_label,
-            amount_label,
-            skip_label,
-            skip_value,
+            separator=None,
+            date_format=None,
+            date_label=None,
+            amount_label=None,
+            skip_label=None,
+            skip_value=None,
     ):
         self.file_path = file_path
 
@@ -83,7 +83,6 @@ class MoneyOverTime:
     It's necessary to retrieve the index of the "amount" and "date"
     columns from their label. This method is case-insensitive.
     """
-
     def __set_index_of_specific_columns(self, columns: list) -> None:
         index = 0
 
@@ -139,7 +138,6 @@ class MoneyOverTime:
     All movements must be sorted chronologically by the
     date they were made.
     """
-
     def __sort_by_date_keys(self, dictionary: dict) -> dict:
         return dict(
             sorted(
@@ -153,7 +151,6 @@ class MoneyOverTime:
     together as keys and the amount of each one is summed
     as the value.
     """
-
     def __sum_total(self, entries: dict) -> dict:
         total = 0
         for date, amount in entries.items():
