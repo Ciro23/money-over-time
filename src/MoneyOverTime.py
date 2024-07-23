@@ -3,9 +3,9 @@ from datetime import datetime
 
 class MoneyOverTime:
     file_path: str = ""
-    date_format: str = "%d/%m/%Y"
-    date_label: dict = {
-        "value": "date",
+    date: dict = {
+        "label": "date",
+        "format": "%d/%m/%Y",
         "index": -1,
     }
     amount_label: dict = {
@@ -37,10 +37,10 @@ class MoneyOverTime:
         self.file_path = file_path
 
         if date_format is not None:
-            self.date_format = date_format
+            self.date['format'] = date_format
 
         if date_label is not None:
-            self.date_label['value'] = date_label
+            self.date['label'] = date_label
 
         if amount_label is not None:
             self.amount_label['value'] = amount_label
@@ -59,7 +59,6 @@ class MoneyOverTime:
     with the date of the movement as the key and the sum of the amount
     of all movements, for that day, as the value.
     """
-
     def get_money_per_time(self) -> dict:
         try:
             rows: list = self.__get_lines_of_file()
@@ -90,8 +89,8 @@ class MoneyOverTime:
 
         for column in columns:
             column = column.lower()
-            if column == self.date_label['value'].lower():
-                self.date_label['index'] = index
+            if column == self.date['label'].lower():
+                self.date['index'] = index
             elif column == self.amount_label['value'].lower():
                 self.amount_label['index'] = index
             elif column == self.skip_label['value'].lower():
@@ -99,7 +98,7 @@ class MoneyOverTime:
 
             index += 1
 
-        if self.date_label['index'] < 0 or self.amount_label['index'] < 0:
+        if self.date['index'] < 0 or self.amount_label['index'] < 0:
             raise ValueError("Could not find the index of the 'date' or 'amount' labels."
                              " Check if their specified label name match the ones in the csv file.")
 
@@ -126,7 +125,7 @@ class MoneyOverTime:
                 if skip.lower() == self.skip_label['match'].lower():
                     continue
 
-            date = columns[self.date_label['index']]
+            date = columns[self.date['index']]
             amount = columns[self.amount_label['index']]
 
             if date in amount_per_date:
@@ -145,7 +144,7 @@ class MoneyOverTime:
         return dict(
             sorted(
                 dictionary.items(),
-                key=lambda x: datetime.strptime(x[0], self.date_format)
+                key=lambda x: datetime.strptime(x[0], self.date['format'])
             )
         )
 
