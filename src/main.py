@@ -53,11 +53,16 @@ class Main:
             help="Based on the column label specified with \"--skip_label\", all"
                  " rows which cell matches this value are not considered"
         )
+        self.parser.add_argument(
+            "-v", "--verbose",
+            action="store_true",
+            help="Prints the actual Python error if something goes wrong while reading the file"
+        )
 
     def execute_program(self):
         file = self.args.file
         if file is None:
-            print("A file path is required. Use --help")
+            print("A file path is required. Use --help.")
             return
 
         money = MoneyOverTime(
@@ -76,7 +81,11 @@ class Main:
             print("File not found!")
             return
         except ValueError as e:
-            print("Error reading the file, check if parameters are correct, use --help for more.")
+            message = "Error reading the file, check if parameters are correct, use --help for more."
+            if self.args.verbose:
+                print(message, e)
+            else:
+                print(message)
             return
 
         plt.plot(money_per_time.keys(), money_per_time.values())
