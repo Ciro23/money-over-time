@@ -1,0 +1,9 @@
+row_number;data;importo;account
+1;06/15/2024;100;cash
+2;06/15/2024;-35;cash
+3;06/16/2024;-15;credit card
+4;06/17/2024;215;credit card
+5;06/17/2024;1270;credit card
+6;06/17/2024;-360;cash
+7;07/01/2024;-10;credit card
+8;07/01/2024;12;cash

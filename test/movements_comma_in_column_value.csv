@@ -1,0 +1,4 @@
+row_number,date,place,amount,account
+1,15/06/2024,restaurant,100,cash
+2,15/06/2024,"boulevard street, 11",-35,cash
+3,16/06/2024,"random place, 1155, europe",-15,credit card
