@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -9,14 +10,15 @@ from MoneyOverTime import MoneyOverTime
 class Main:
 
     def __init__(self):
-        self.parser = argparse.ArgumentParser()
+        self.parser = argparse.ArgumentParser(description="Reads movements from a CSV file and shows a plot graph"
+                                                          " of the capital's trend over time.")
         self.add_arguments()
         self.args = self.parser.parse_args()
 
         file = self.args.file
         if file is None:
             print("A file path is required. Use --help.")
-            return
+            sys.exit(1)
 
         self.money = MoneyOverTime(
             file,
@@ -30,12 +32,12 @@ class Main:
 
     def add_arguments(self):
         self.parser.add_argument(
-            "--file",
+            "-f", "--file",
             type=str,
             help="CSV containing all transactions path"
         )
         self.parser.add_argument(
-            "--separator",
+            "-s", "--separator",
             type=str,
             nargs="?",
             help="Column separator, default \",\""
