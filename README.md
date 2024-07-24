@@ -53,4 +53,4 @@ This program is compatible and tested with Python 3.10, this guide assumes you'r
     ```
 
 ## Gallery
-![Figure_1](https://github.com/Ciro23/money-over-time/assets/38884767/3e3c8e1e-1fa6-48f7-aef7-b5315f97965b)
+![Figure1](https://github.com/user-attachments/assets/3bfcfae2-c956-41bc-9c36-c3702a4fcfd2)
