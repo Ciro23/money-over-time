@@ -1,6 +1,9 @@
-from MoneyOverTime import MoneyOverTime
-import matplotlib.pyplot as plt
 import argparse
+
+import pandas as pd
+import plotly.graph_objects as go
+
+from MoneyOverTime import MoneyOverTime
 
 
 class Main:
@@ -9,6 +12,21 @@ class Main:
         self.parser = argparse.ArgumentParser()
         self.add_arguments()
         self.args = self.parser.parse_args()
+
+        file = self.args.file
+        if file is None:
+            print("A file path is required. Use --help.")
+            return
+
+        self.money = MoneyOverTime(
+            file,
+            self.args.separator,
+            self.args.date_format,
+            self.args.date_label,
+            self.args.amount_label,
+            self.args.skip_label,
+            self.args.skip_value,
+        )
 
     def add_arguments(self):
         self.parser.add_argument(
@@ -60,23 +78,8 @@ class Main:
         )
 
     def execute_program(self):
-        file = self.args.file
-        if file is None:
-            print("A file path is required. Use --help.")
-            return
-
-        money = MoneyOverTime(
-            file,
-            self.args.separator,
-            self.args.date_format,
-            self.args.date_label,
-            self.args.amount_label,
-            self.args.skip_label,
-            self.args.skip_value,
-        )
-
         try:
-            money_per_time: dict = money.get_money_per_time()
+            money_over_time: dict = self.money.get_money_over_time()
         except FileNotFoundError:
             print("File not found!")
             return
@@ -88,10 +91,34 @@ class Main:
                 print(message)
             return
 
-        plt.plot(money_per_time.keys(), money_per_time.values())
-        plt.xticks(rotation=45)
-        plt.gca().set_xticks(plt.gca().get_xticks()[::30])
-        plt.show()
+        self.show_graph(money_over_time)
+
+    def show_graph(self, money_over_time: dict):
+        """
+        Plotly is used to display an interactive graph.
+        """
+        data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
+        data_frame['date'] = pd.to_datetime(data_frame['date'], format=self.money.date['format'])
+
+        data_frame = data_frame.sort_values(by='date')
+        plot_graph = go.Figure()
+        plot_graph.add_trace(
+            go.Scatter(
+                x=data_frame['date'],
+                y=data_frame['value'],
+                mode='lines+markers',
+                name='Value',
+                hovertemplate='<b>Date</b>: %{x}<br><b>Amount</b>: %{y}<extra></extra>',
+            )
+        )
+        plot_graph.update_layout(
+            title='Money over time',
+            xaxis_title='Date',
+            yaxis_title='Amount',
+            hovermode='x unified',
+        )
+
+        plot_graph.show()
 
 
 if __name__ == "__main__":

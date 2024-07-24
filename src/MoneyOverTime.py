@@ -45,7 +45,7 @@ class MoneyOverTime:
             "match": skip_value if skip_value is not None else "",
         }
 
-    def get_money_per_time(self) -> dict:
+    def get_money_over_time(self) -> dict:
         """
         Reads all the movements in the specified file and returns a dict
         with the date of the movement as the key and the sum of the amount
