@@ -6,24 +6,25 @@ def get_lines_of_file(file_path: str) -> list:
     with open(file_path, "r", encoding="utf-8-sig") as file:
         return file.read().splitlines()
 
-def get_row_columns(separator, row: str) -> list:
+def get_row_cells(separator: str, row: str) -> list:
     return next(csv.reader([row], delimiter=separator))
 
-def get_index_of_column(column_label: str, columns: list) -> int:
+def get_index_of_cell(cell_value: str, cells: list) -> int:
     """
-    It's necessary to retrieve the index of columns given their label.
+    It's necessary to retrieve the index of cells given their label, so users
+    only need to memorize the human-readable value inside them.
     This method is case-insensitive.
     """
 
     index = 0
-    for column in columns:
-        if column.lower() == column_label.lower():
+    for cell in cells:
+        if cell.lower() == cell_value.lower():
             return index
 
         index += 1
 
-    raise ValueError(f"Could not find the index of the column with label '{column_label}'"
-                     " Check if the specified label name match the one in the csv file.")
+    raise ValueError(f"Could not find the index of the cell with label '{cell_value}'"
+                     " Check if the specified value match the one in the csv file.")
 
 def get_entries_per_date(
         separator: str,
@@ -34,7 +35,7 @@ def get_entries_per_date(
 ) -> dict:
     amount_per_date: dict = {}
     for row in rows:
-        columns = get_row_columns(separator, row)
+        columns = get_row_cells(separator, row)
 
         date = columns[date_index]
         amount = columns[amount_index]

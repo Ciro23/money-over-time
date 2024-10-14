@@ -4,10 +4,11 @@ from typing import Optional
 
 def sum_total(entries: dict) -> dict:
     """
-    Given all movement entries, all the dates are grouped
-    together as keys and the amount of each one is summed
-    as the value.
+    Given a dictionary of movement entries with dates as keys and amounts as values,
+    this function calculates a cumulative total amount and updates each entry
+    to reflect the running total up to that date.
     """
+
     total = 0
     for date, amount in entries.items():
         total += amount
@@ -56,12 +57,12 @@ class MoneyOverTime:
             raise FileNotFoundError(e)
 
         try:
-            column_headers = get_row_columns(self.separator, rows[0])
-            self.date['index'] = get_index_of_column(self.date['label'], column_headers)
-            self.amount['index'] = get_index_of_column(self.amount['label'], column_headers)
+            column_headers = get_row_cells(self.separator, rows[0])
+            self.date['index'] = get_index_of_cell(self.date['label'], column_headers)
+            self.amount['index'] = get_index_of_cell(self.amount['label'], column_headers)
 
             if self.skip_label['value'] != "":
-                self.skip_label['index'] = get_index_of_column(self.skip_label['value'], column_headers)
+                self.skip_label['index'] = get_index_of_cell(self.skip_label['value'], column_headers)
         except ValueError as e:
             raise ValueError(e)
 
@@ -86,7 +87,7 @@ class MoneyOverTime:
 
         rows_without_entries_to_skip = []
         for row in rows:
-            columns = get_row_columns(self.separator, row)
+            columns = get_row_cells(self.separator, row)
 
             # If the index of the "column to skip" has been set,
             # then the value in the cell of this row must be checked,

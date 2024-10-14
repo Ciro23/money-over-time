@@ -4,11 +4,21 @@ import pandas as pd
 from src.movements_reader import *
 
 
-def sum_total(entries: dict) -> dict:
+def round_amounts(entries: dict) -> dict:
     for date, amount in entries.items():
         entries[date] = round(amount, 2)
 
     return entries
+
+
+def convert_xlsx_to_csv(xlsx_file: str):
+    df = pd.read_excel(xlsx_file, engine='openpyxl')
+
+    csv_buffer = StringIO()
+    df.to_csv(csv_buffer, encoding='utf-8', index=False)
+
+    csv_buffer.seek(0)
+    return csv_buffer
 
 
 class DiffOverTime:
@@ -54,16 +64,24 @@ class DiffOverTime:
         }
 
     def get_diff_over_time(self):
+        """
+        Calculates the differences in financial entries over time
+        between a source file and a reference file.
+        This method is designed to help users track differences in recorded
+        financial amounts against a reference dataset, enabling them to identify potential
+        accountability errors.
+        """
+
         try:
             rows: list = get_lines_of_file(self.source_file_path)
         except FileNotFoundError as e:
             raise FileNotFoundError(e)
 
         try:
-            column_headers = get_row_columns(self.source_separator, rows[0])
-            self.source_date['index'] = get_index_of_column(self.source_date['label'], column_headers)
-            self.source_amount['index'] = get_index_of_column(self.source_amount['label'], column_headers)
-            account_index = get_index_of_column(self.source_account_label, column_headers)
+            column_headers = get_row_cells(self.source_separator, rows[0])
+            self.source_date['index'] = get_index_of_cell(self.source_date['label'], column_headers)
+            self.source_amount['index'] = get_index_of_cell(self.source_amount['label'], column_headers)
+            account_index = get_index_of_cell(self.source_account_label, column_headers)
 
             rows_without_header = rows[1:]
             rows_of_specified_account = self.__keep_only_entries_of_account(account_index, rows_without_header)
@@ -75,13 +93,13 @@ class DiffOverTime:
                 self.source_date['format'],
                 self.source_amount['index']
             )
-            source_entries = sum_total(source_entries)
+            source_entries = round_amounts(source_entries)
         except ValueError as e:
             raise ValueError(e)
 
         try:
             if self.reference_file_path.endswith(".xlsx"):
-                csv_data_in_memory = self.convert_xlsx_to_csv_in_memory(self.reference_file_path)
+                csv_data_in_memory = convert_xlsx_to_csv(self.reference_file_path)
                 pd.read_csv(csv_data_in_memory)
                 rows = csv_data_in_memory.getvalue().splitlines()
 
@@ -93,9 +111,9 @@ class DiffOverTime:
             raise FileNotFoundError(e)
 
         try:
-            column_headers = get_row_columns(self.reference_separator, rows[0])
-            self.reference_date['index'] = get_index_of_column(self.reference_date['label'], column_headers)
-            self.reference_amount['index'] = get_index_of_column(self.reference_amount['label'], column_headers)
+            column_headers = get_row_cells(self.reference_separator, rows[0])
+            self.reference_date['index'] = get_index_of_cell(self.reference_date['label'], column_headers)
+            self.reference_amount['index'] = get_index_of_cell(self.reference_amount['label'], column_headers)
             rows_without_header = rows[1:]
 
             reference_entries: dict = get_entries_per_date(
@@ -105,17 +123,13 @@ class DiffOverTime:
                 self.reference_date['format'],
                 self.reference_amount['index']
             )
-            reference_entries = sum_total(reference_entries)
+            reference_entries = round_amounts(reference_entries)
 
+            # fuck pandas! todo: explain why panda wants to convert your dates!!!
             converted_reference_entries = {}
             for date_str, amount in reference_entries.items():
-                # Convert the current date string to a datetime object
                 date_obj = datetime.strptime(date_str, self.reference_date['format'])
-
-                # Format it to the desired source date format
                 formatted_date = date_obj.strftime(self.source_date['format'])
-
-                # Add to the new dictionary
                 converted_reference_entries[formatted_date] = amount
 
         except ValueError as e:
@@ -126,7 +140,7 @@ class DiffOverTime:
     def __keep_only_entries_of_account(self, account_index: int, rows: list) -> list:
         rows_of_account = []
         for row in rows:
-            columns = get_row_columns(self.source_separator, row)
+            columns = get_row_cells(self.source_separator, row)
 
             skip: str = columns[account_index]
             if skip.lower() == self.source_account.lower():
@@ -153,12 +167,3 @@ class DiffOverTime:
                 discrepancies[date] = {"dict1": None, "dict2": dict2[date]}
 
         return sort_by_date_keys(self.source_date['format'], discrepancies)
-
-    def convert_xlsx_to_csv_in_memory(self, xlsx_file: str):
-        df = pd.read_excel(xlsx_file, engine='openpyxl')
-
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, encoding='utf-8', index=False)
-
-        csv_buffer.seek(0)
-        return csv_buffer

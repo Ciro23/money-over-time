@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -80,7 +79,7 @@ def configure_diff_command(parser):
         "-a", "--account",
         type=str,
         required=True,
-        help="The name of the account" # TODO: description
+        help="The name of the account" # TODO: description. make generic instead of only "accounts"?
     )
     parser.add_argument(
         "--source_date_format",
@@ -138,6 +137,35 @@ def configure_diff_command(parser):
         help="Prints the actual Python error if something goes wrong while reading the file"
     )
 
+
+def show_graph(date_format: str, money_over_time: dict):
+    """
+    Plotly is used to display an interactive graph.
+    """
+    data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
+    data_frame['date'] = pd.to_datetime(data_frame['date'], format=date_format)
+
+    data_frame = data_frame.sort_values(by='date')
+    plot_graph = go.Figure()
+    plot_graph.add_trace(
+        go.Scatter(
+            x=data_frame['date'],
+            y=data_frame['value'],
+            mode='lines+markers',
+            name='Value',
+            hovertemplate='<b>Date</b>: %{x}<br><b>Amount</b>: %{y}<extra></extra>',
+        )
+    )
+    plot_graph.update_layout(
+        title='Money over time',
+        xaxis_title='Date',
+        yaxis_title='Amount',
+        hovermode='x unified',
+    )
+
+    plot_graph.show()
+
+
 class Main:
 
     def __init__(self):
@@ -145,8 +173,14 @@ class Main:
         self.parser = argparse.ArgumentParser(description=program_desc)
 
         subparsers = self.parser.add_subparsers(dest="command", help="Available commands", required=True)
-        plot_parser = subparsers.add_parser("plot", help="Reads movements from a CSV file and shows a plot graph of the capital's trend over time.")
-        diff_parser = subparsers.add_parser("diff", help="Compares two sets of financial records to find discrepancies.")
+        plot_parser = subparsers.add_parser(
+            "plot",
+            help="Reads movements from a CSV file and shows a plot graph of the capital's trend over time."
+        )
+        diff_parser = subparsers.add_parser(
+            "diff",
+            help="Compares two sets of financial records to find discrepancies."
+        )
 
         configure_plot_command(plot_parser)
         configure_diff_command(diff_parser)
@@ -183,7 +217,7 @@ class Main:
                 print(message)
             return
 
-        self.__show_graph(money_over_time.date['format'], amount_of_money_over_time)
+        show_graph(money_over_time.date['format'], amount_of_money_over_time)
 
     def __execute_diff_over_time(self):
         diff_over_time = DiffOverTime(
@@ -240,33 +274,6 @@ class Main:
                     f"\n   Difference: {dict2_value - dict1_value:.2f}")
 
             print("--------------------------------------")
-
-    def __show_graph(self, date_format: str, money_over_time: dict):
-        """
-        Plotly is used to display an interactive graph.
-        """
-        data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
-        data_frame['date'] = pd.to_datetime(data_frame['date'], format=date_format)
-
-        data_frame = data_frame.sort_values(by='date')
-        plot_graph = go.Figure()
-        plot_graph.add_trace(
-            go.Scatter(
-                x=data_frame['date'],
-                y=data_frame['value'],
-                mode='lines+markers',
-                name='Value',
-                hovertemplate='<b>Date</b>: %{x}<br><b>Amount</b>: %{y}<extra></extra>',
-            )
-        )
-        plot_graph.update_layout(
-            title='Money over time',
-            xaxis_title='Date',
-            yaxis_title='Amount',
-            hovermode='x unified',
-        )
-
-        plot_graph.show()
 
 
 if __name__ == "__main__":
