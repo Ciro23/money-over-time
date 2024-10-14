@@ -152,7 +152,7 @@ class DiffOverTime:
             if date not in dict1:
                 discrepancies[date] = {"dict1": None, "dict2": dict2[date]}
 
-        return discrepancies
+        return sort_by_date_keys(self.source_date['format'], discrepancies)
 
     def convert_xlsx_to_csv_in_memory(self, xlsx_file: str):
         df = pd.read_excel(xlsx_file, engine='openpyxl')

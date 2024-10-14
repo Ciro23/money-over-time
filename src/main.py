@@ -225,12 +225,21 @@ class Main:
             dict2_value = values['dict2']
 
             if dict1_value is None:
-                print(f"Date: {date}, Source: Not available, Reference: {dict2_value:.2f}")
+                print(f"# {date}"
+                      f"\n   Source: Not available"
+                      f"\n   Reference: {dict2_value:.2f}")
             elif dict2_value is None:
-                print(f"Date: {date}, Source: {dict1_value:.2f}, Reference: Not available")
+                print(f"# {date}"
+                      f"\n   Source: {dict1_value:.2f}"
+                      f"\n   Reference: Not available")
             else:
                 print(
-                    f"Date: {date}, Source: {dict1_value:.2f}, Reference: {dict2_value:.2f}, Difference: {dict2_value - dict1_value:.2f}")
+                    f"# {date}"
+                    f"\n   Source: {dict1_value:.2f}"
+                    f"\n   Reference: {dict2_value:.2f}"
+                    f"\n   Difference: {dict2_value - dict1_value:.2f}")
+
+            print("--------------------------------------")
 
     def __show_graph(self, date_format: str, money_over_time: dict):
         """
