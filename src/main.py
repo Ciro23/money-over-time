@@ -7,12 +7,66 @@ import plotly.graph_objects as go
 from MoneyOverTime import MoneyOverTime
 
 
+def configure_plot_command(parser):
+    parser.add_argument(
+        "-f", "--file",
+        type=str,
+        help="CSV containing all transactions path"
+    )
+    parser.add_argument(
+        "-s", "--separator",
+        type=str,
+        nargs="?",
+        help="Column separator, default \",\""
+    )
+    parser.add_argument(
+        "--date_format",
+        type=str,
+        nargs="?",
+        help="Date format used in the CSV file, default \"%%d/%%m/%%Y\""
+    )
+    parser.add_argument(
+        "--date_label",
+        type=str,
+        nargs="?",
+        help="Date label used in the CSV file, default \"date\""
+    )
+    parser.add_argument(
+        "--amount_label",
+        type=str,
+        nargs="?",
+        help="Amount label used in the CSV file, default \"amount\""
+    )
+    parser.add_argument(
+        "--skip_label",
+        type=str,
+        nargs="?",
+        help="The label of the column used to filter out some movements"
+    )
+    parser.add_argument(
+        "--skip_value",
+        type=str,
+        nargs="?",
+        help="Based on the column label specified with \"--skip_label\", all"
+             " rows which cell matches this value are not considered"
+    )
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Prints the actual Python error if something goes wrong while reading the file"
+    )
+
+
 class Main:
 
     def __init__(self):
-        self.parser = argparse.ArgumentParser(description="Reads movements from a CSV file and shows a plot graph"
-                                                          " of the capital's trend over time.")
-        self.__configure_arguments()
+        program_desc = "Reads movements from a CSV file and shows a plot graph of the capital's trend over time."
+        self.parser = argparse.ArgumentParser(description=program_desc)
+
+        subparsers = self.parser.add_subparsers(dest="command", help="Available commands")
+        plot_parser = subparsers.add_parser("plot", help="Show plot graph")
+
+        configure_plot_command(plot_parser)
         self.args = self.parser.parse_args()
 
         file = self.args.file
@@ -72,55 +126,6 @@ class Main:
         )
 
         plot_graph.show()
-
-    def __configure_arguments(self):
-        self.parser.add_argument(
-            "-f", "--file",
-            type=str,
-            help="CSV containing all transactions path"
-        )
-        self.parser.add_argument(
-            "-s", "--separator",
-            type=str,
-            nargs="?",
-            help="Column separator, default \",\""
-        )
-        self.parser.add_argument(
-            "--date_format",
-            type=str,
-            nargs="?",
-            help="Date format used in the CSV file, default \"%%d/%%m/%%Y\""
-        )
-        self.parser.add_argument(
-            "--date_label",
-            type=str,
-            nargs="?",
-            help="Date label used in the CSV file, default \"date\""
-        )
-        self.parser.add_argument(
-            "--amount_label",
-            type=str,
-            nargs="?",
-            help="Amount label used in the CSV file, default \"amount\""
-        )
-        self.parser.add_argument(
-            "--skip_label",
-            type=str,
-            nargs="?",
-            help="The label of the column used to filter out some movements"
-        )
-        self.parser.add_argument(
-            "--skip_value",
-            type=str,
-            nargs="?",
-            help="Based on the column label specified with \"--skip_label\", all"
-                 " rows which cell matches this value are not considered"
-        )
-        self.parser.add_argument(
-            "-v", "--verbose",
-            action="store_true",
-            help="Prints the actual Python error if something goes wrong while reading the file"
-        )
 
 
 if __name__ == "__main__":
