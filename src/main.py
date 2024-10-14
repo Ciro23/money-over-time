@@ -4,7 +4,7 @@ import sys
 import pandas as pd
 import plotly.graph_objects as go
 
-from MoneyOverTime import MoneyOverTime
+from money_over_time import MoneyOverTime
 
 
 def configure_plot_command(parser):

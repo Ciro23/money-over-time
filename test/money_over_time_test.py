@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from src.MoneyOverTime import MoneyOverTime
+from src.money_over_time import MoneyOverTime
 
 
 class MoneyOverTimeTest(unittest.TestCase):
