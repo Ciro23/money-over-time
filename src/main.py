@@ -12,7 +12,7 @@ class Main:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description="Reads movements from a CSV file and shows a plot graph"
                                                           " of the capital's trend over time.")
-        self.add_arguments()
+        self.__configure_arguments()
         self.args = self.parser.parse_args()
 
         file = self.args.file
@@ -30,7 +30,50 @@ class Main:
             self.args.skip_value,
         )
 
-    def add_arguments(self):
+    def execute_program(self):
+        try:
+            money_over_time: dict = self.money.get_money_over_time()
+        except FileNotFoundError:
+            print("File not found!")
+            return
+        except ValueError as e:
+            message = "Error reading the file, check if parameters are correct, use --help for more."
+            if self.args.verbose:
+                print(message, e)
+            else:
+                print(message)
+            return
+
+        self.__show_graph(money_over_time)
+
+    def __show_graph(self, money_over_time: dict):
+        """
+        Plotly is used to display an interactive graph.
+        """
+        data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
+        data_frame['date'] = pd.to_datetime(data_frame['date'], format=self.money.date['format'])
+
+        data_frame = data_frame.sort_values(by='date')
+        plot_graph = go.Figure()
+        plot_graph.add_trace(
+            go.Scatter(
+                x=data_frame['date'],
+                y=data_frame['value'],
+                mode='lines+markers',
+                name='Value',
+                hovertemplate='<b>Date</b>: %{x}<br><b>Amount</b>: %{y}<extra></extra>',
+            )
+        )
+        plot_graph.update_layout(
+            title='Money over time',
+            xaxis_title='Date',
+            yaxis_title='Amount',
+            hovermode='x unified',
+        )
+
+        plot_graph.show()
+
+    def __configure_arguments(self):
         self.parser.add_argument(
             "-f", "--file",
             type=str,
@@ -78,49 +121,6 @@ class Main:
             action="store_true",
             help="Prints the actual Python error if something goes wrong while reading the file"
         )
-
-    def execute_program(self):
-        try:
-            money_over_time: dict = self.money.get_money_over_time()
-        except FileNotFoundError:
-            print("File not found!")
-            return
-        except ValueError as e:
-            message = "Error reading the file, check if parameters are correct, use --help for more."
-            if self.args.verbose:
-                print(message, e)
-            else:
-                print(message)
-            return
-
-        self.show_graph(money_over_time)
-
-    def show_graph(self, money_over_time: dict):
-        """
-        Plotly is used to display an interactive graph.
-        """
-        data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
-        data_frame['date'] = pd.to_datetime(data_frame['date'], format=self.money.date['format'])
-
-        data_frame = data_frame.sort_values(by='date')
-        plot_graph = go.Figure()
-        plot_graph.add_trace(
-            go.Scatter(
-                x=data_frame['date'],
-                y=data_frame['value'],
-                mode='lines+markers',
-                name='Value',
-                hovertemplate='<b>Date</b>: %{x}<br><b>Amount</b>: %{y}<extra></extra>',
-            )
-        )
-        plot_graph.update_layout(
-            title='Money over time',
-            xaxis_title='Date',
-            yaxis_title='Amount',
-            hovermode='x unified',
-        )
-
-        plot_graph.show()
 
 
 if __name__ == "__main__":
