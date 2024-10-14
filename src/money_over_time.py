@@ -62,19 +62,19 @@ class MoneyOverTime:
 
             if self.skip_label['value'] != "":
                 self.skip_label['index'] = get_index_of_column(self.skip_label['value'], column_headers)
-
-            rows_without_header = rows[1:]
-            rows_without_entries_to_skip = self.__remove_entries_to_skip(rows_without_header)
-
-            entries: dict = get_entries_per_date(
-                self.separator,
-                rows_without_entries_to_skip,
-                self.date['index'],
-                self.date['format'],
-                self.amount['index']
-            )
         except ValueError as e:
             raise ValueError(e)
+
+        rows_without_header = rows[1:]
+        rows_without_entries_to_skip = self.__remove_entries_to_skip(rows_without_header)
+
+        entries: dict = get_entries_per_date(
+            self.separator,
+            rows_without_entries_to_skip,
+            self.date['index'],
+            self.date['format'],
+            self.amount['index']
+        )
 
         return sum_total(entries)
 

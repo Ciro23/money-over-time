@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 import plotly.graph_objects as go
 
+from src.diff_over_time import DiffOverTime
 from src.money_over_time import MoneyOverTime
 
 
@@ -71,8 +72,14 @@ def configure_diff_command(parser):
         help="Column separator, default \",\""
     )
     parser.add_argument(
+        "--account_label",
+        type=str,
+        help="Account label used in the source CSV file, default \"account\""
+    )
+    parser.add_argument(
         "-a", "--account",
         type=str,
+        required=True,
         help="The name of the account" # TODO: description
     )
     parser.add_argument(
@@ -125,6 +132,12 @@ def configure_diff_command(parser):
         help="Amount label used in the reference CSV file, default \"amount\""
     )
 
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Prints the actual Python error if something goes wrong while reading the file"
+    )
+
 class Main:
 
     def __init__(self):
@@ -140,7 +153,14 @@ class Main:
 
         self.args = self.parser.parse_args()
 
-        self.money = MoneyOverTime(
+    def execute_program(self):
+        if self.args.command == "plot":
+            self.__execute_money_over_time()
+        elif self.args.command == "diff":
+            self.__execute_diff_over_time()
+
+    def __execute_money_over_time(self):
+        money_over_time = MoneyOverTime(
             self.args.file,
             self.args.separator,
             self.args.date_format,
@@ -150,9 +170,8 @@ class Main:
             self.args.skip_value,
         )
 
-    def execute_program(self):
         try:
-            money_over_time: dict = self.money.get_money_over_time()
+            amount_of_money_over_time: dict = money_over_time.get_money_over_time()
         except FileNotFoundError:
             print("File not found!")
             return
@@ -164,14 +183,61 @@ class Main:
                 print(message)
             return
 
-        self.__show_graph(money_over_time)
+        self.__show_graph(money_over_time.date['format'], amount_of_money_over_time)
 
-    def __show_graph(self, money_over_time: dict):
+    def __execute_diff_over_time(self):
+        diff_over_time = DiffOverTime(
+            self.args.source_file,
+            self.args.reference_file,
+            self.args.account,
+            self.args.account_label,
+            self.args.source_separator,
+            self.args.source_date_format,
+            self.args.source_date_label,
+            self.args.source_amount_label,
+            self.args.reference_separator,
+            self.args.reference_date_format,
+            self.args.reference_date_label,
+            self.args.reference_amount_label
+        )
+
+        try:
+            differences_over_time: dict = diff_over_time.get_diff_over_time()
+        except FileNotFoundError as e:
+            message = "File not found!"
+            print(message)
+            if self.args.verbose:
+                print(message, e)
+            else:
+                print(message)
+            return
+        except ValueError as e:
+            message = "Error reading the file, check if parameters are correct, use --help for more."
+            if self.args.verbose:
+                print(message, e)
+            else:
+                print(message)
+            return
+
+        print("Discrepancies found:")
+        for date, values in differences_over_time.items():
+            dict1_value = values['dict1']
+            dict2_value = values['dict2']
+
+            if dict1_value is None:
+                print(f"Date: {date}, Source: Not available, Reference: {dict2_value:.2f}")
+            elif dict2_value is None:
+                print(f"Date: {date}, Source: {dict1_value:.2f}, Reference: Not available")
+            else:
+                print(
+                    f"Date: {date}, Source: {dict1_value:.2f}, Reference: {dict2_value:.2f}, Difference: {dict2_value - dict1_value:.2f}")
+
+    def __show_graph(self, date_format: str, money_over_time: dict):
         """
         Plotly is used to display an interactive graph.
         """
         data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
-        data_frame['date'] = pd.to_datetime(data_frame['date'], format=self.money.date['format'])
+        data_frame['date'] = pd.to_datetime(data_frame['date'], format=date_format)
 
         data_frame = data_frame.sort_values(by='date')
         plot_graph = go.Figure()
