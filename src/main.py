@@ -56,17 +56,73 @@ def configure_plot_command(parser):
         help="Prints the actual Python error if something goes wrong while reading the file"
     )
 
+def configure_diff_command(parser):
+    parser.add_argument(
+        "-s", "--source_file",
+        type=str,
+        help="CSV containing all transactions path"
+    )
+    parser.add_argument(
+        "-a", "--account",
+        type=str,
+        help="The name of the account" # TODO: description
+    )
+    parser.add_argument(
+        "--source_date_format",
+        type=str,
+        nargs="?",
+        help="Date format used in the source CSV file, default \"%%d/%%m/%%Y\""
+    )
+    parser.add_argument(
+        "--source_date_label",
+        type=str,
+        nargs="?",
+        help="Date label used in the source CSV file, default \"date\""
+    )
+    parser.add_argument(
+        "--source_amount_label",
+        type=str,
+        nargs="?",
+        help="Amount label used in the source CSV file, default \"amount\""
+    )
+
+    parser.add_argument(
+        "-r", "--reference_file",
+        type=str,
+        help="CSV containing all transactions path"
+    )
+    parser.add_argument(
+        "--reference_date_format",
+        type=str,
+        nargs="?",
+        help="Date format used in the reference CSV file, default \"%%d/%%m/%%Y\""
+    )
+    parser.add_argument(
+        "--reference_date_label",
+        type=str,
+        nargs="?",
+        help="Date label used in the reference CSV file, default \"date\""
+    )
+    parser.add_argument(
+        "--reference_amount_label",
+        type=str,
+        nargs="?",
+        help="Amount label used in the reference CSV file, default \"amount\""
+    )
 
 class Main:
 
     def __init__(self):
-        program_desc = "Reads movements from a CSV file and shows a plot graph of the capital's trend over time."
+        program_desc = "A tool to manage and analyze financial records."
         self.parser = argparse.ArgumentParser(description=program_desc)
 
         subparsers = self.parser.add_subparsers(dest="command", help="Available commands")
-        plot_parser = subparsers.add_parser("plot", help="Show plot graph")
+        plot_parser = subparsers.add_parser("plot", help="Reads movements from a CSV file and shows a plot graph of the capital's trend over time.")
+        diff_parser = subparsers.add_parser("diff", help="Compares two sets of financial records to find discrepancies.")
 
         configure_plot_command(plot_parser)
+        configure_diff_command(diff_parser)
+
         self.args = self.parser.parse_args()
 
         file = self.args.file
