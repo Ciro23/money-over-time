@@ -11,7 +11,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         Movements are read from a file with the default parameters (date label,
         date format, amount label, separator character...)
         """
-        file_path = os.path.join(os.path.dirname(__file__), 'movements_default.csv')
+        file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
         money_over_time = MoneyOverTime(file_path)
         money_by_date = money_over_time.get_money_over_time()
 
@@ -27,7 +27,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         """
         The column labels should be case-insensitive.
         """
-        file_path = os.path.join(os.path.dirname(__file__), 'movements_default.csv')
+        file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
         money_over_time = MoneyOverTime(
             file_path,
             date_label="DATE",
@@ -48,7 +48,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         Certain rows can be skipped if a given column value matches a discriminating
         word or phrase.
         """
-        file_path = os.path.join(os.path.dirname(__file__), 'movements_default.csv')
+        file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
         money_over_time = MoneyOverTime(file_path, skip_label="account", skip_value="cash")
         money_by_date = money_over_time.get_money_over_time()
 
@@ -60,7 +60,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         self.assertEqual(expected, money_by_date)
 
     def test_custom_properties(self):
-        file_path = os.path.join(os.path.dirname(__file__), 'movements_custom_properties.csv')
+        file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_custom_properties.csv')
         money_over_time = MoneyOverTime(
             file_path,
             separator=";",
@@ -85,7 +85,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         an additional column to be considered with the value of an empty string, causing
         lots of rows to be wrongfully skipped.
         """
-        file_path = os.path.join(os.path.dirname(__file__), 'movements_trailing_comma.csv')
+        file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_trailing_comma.csv')
         money_over_time = MoneyOverTime(file_path)
         money_by_date = money_over_time.get_money_over_time()
 
@@ -103,7 +103,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         value is quoted. This case caused errors because the columns were split manually,
         instead of using a proper csv library.
         """
-        file_path = os.path.join(os.path.dirname(__file__), 'movements_comma_in_column_value.csv')
+        file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_comma_in_column_value.csv')
         money_over_time = MoneyOverTime(file_path)
         money_by_date = money_over_time.get_money_over_time()
 
