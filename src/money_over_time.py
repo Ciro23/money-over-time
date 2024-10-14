@@ -1,5 +1,4 @@
-import csv
-from datetime import datetime
+from src.movements_reader import *
 from typing import Optional
 
 
@@ -52,63 +51,42 @@ class MoneyOverTime:
         of all movements, for that day, as the value.
         """
         try:
-            rows: list = self.__get_lines_of_file()
+            rows: list = get_lines_of_file(self.file_path)
         except FileNotFoundError as e:
             raise FileNotFoundError(e)
 
         try:
-            entries: dict = self.__get_entries_per_date(rows)
+            column_headers = get_row_columns(self.separator, rows[0])
+            self.date['index'] = get_index_of_column(self.date['label'], column_headers)
+            self.amount['index'] = get_index_of_column(self.amount['label'], column_headers)
+
+            if self.skip_label['value'] != "":
+                self.skip_label['index'] = get_index_of_column(self.skip_label['value'], column_headers)
+
+            rows_without_header = rows[1:]
+            rows_without_entries_to_skip = self.__remove_entries_to_skip(rows_without_header)
+
+            entries: dict = get_entries_per_date(
+                self.separator,
+                rows_without_entries_to_skip,
+                self.date['index'],
+                self.date['format'],
+                self.amount['index']
+            )
         except ValueError as e:
             raise ValueError(e)
 
         return sum_total(entries)
 
-    def __get_lines_of_file(self) -> list:
-        with open(self.file_path, "r", encoding="utf-8-sig") as file:
-            return file.read().splitlines()
-
-    def __get_row_columns(self, row: str) -> list:
-        return next(csv.reader([row], delimiter=self.separator))
-
-    def __set_index_of_specific_columns(self, columns: list) -> None:
+    def __remove_entries_to_skip(self, rows: list) -> list:
         """
-        It's necessary to retrieve the index of the "amount" and "date"
-        columns from their label. This method is case-insensitive.
+        It's possible to exclude some movements based on some column value. For example,
+        this may be useful when movements of an investment account should not be considered.
         """
-        index = 0
 
-        for column in columns:
-            column = column.lower()
-            if column == self.date['label'].lower():
-                self.date['index'] = index
-            elif column == self.amount['label'].lower():
-                self.amount['index'] = index
-            elif column == self.skip_label['value'].lower() and column != "":
-                # If no row should be skipped, columns containing empty strings must
-                # not be considered, to avoid errors with trailing commas in the csv,
-                # as the default value of self.skip_label['value'] is "".
-                self.skip_label['index'] = index
-
-            index += 1
-
-        if self.date['index'] < 0 or self.amount['index'] < 0:
-            raise ValueError("Could not find the index of the 'date' or 'amount' labels."
-                             " Check if their specified label name match the ones in the csv file.")
-
-    def __get_entries_per_date(self, rows: list) -> dict:
-        amount_per_date: dict = {}
-        execute_only_the_first_time: bool = True
-
+        rows_without_entries_to_skip = []
         for row in rows:
-            columns = self.__get_row_columns(row)
-
-            if execute_only_the_first_time:
-                execute_only_the_first_time = False
-                try:
-                    self.__set_index_of_specific_columns(columns)
-                except ValueError as e:
-                    raise ValueError(e)
-                continue
+            columns = get_row_columns(self.separator, row)
 
             # If the index of the "column to skip" has been set,
             # then the value in the cell of this row must be checked,
@@ -118,25 +96,6 @@ class MoneyOverTime:
                 if skip.lower() == self.skip_label['match'].lower():
                     continue
 
-            date = columns[self.date['index']]
-            amount = columns[self.amount['index']]
-            float_amount = float(amount)
+            rows_without_entries_to_skip.append(row)
 
-            if date in amount_per_date:
-                amount_per_date[date] += float_amount
-            else:
-                amount_per_date[date] = float_amount
-
-        return self.__sort_by_date_keys(amount_per_date)
-
-    def __sort_by_date_keys(self, dictionary: dict) -> dict:
-        """
-        All movements must be sorted chronologically by the
-        date they were made.
-        """
-        return dict(
-            sorted(
-                dictionary.items(),
-                key=lambda x: datetime.strptime(x[0], self.date['format'])
-            )
-        )
+        return rows_without_entries_to_skip

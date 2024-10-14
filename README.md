@@ -36,7 +36,7 @@ money-over-time
 ```
 All string parameters for column labels are handled in a case-insensitive manner.
 ## Building from source
-This program is compatible and tested with Python 3.10, this guide assumes you're using Linux or macOS.  
+This program is compatible and tested with Python 3.10 and this guide assumes you're using Linux or macOS.
 1. Download Python 3.10 using your package manager or from the official website.
 2. Create a virtual environment ("myenv" may be changed based on your preferences):
     ```shell
@@ -49,7 +49,11 @@ This program is compatible and tested with Python 3.10, this guide assumes you'r
     ```
 4. Modify and execute the program with Python:
     ```shell
-    python src/main.py
+    python -m src.main
+    ```
+5. Run the unit tests with:
+   ```shell
+    python -m unittest discover -s test
     ```
 
 ## Gallery

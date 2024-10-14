@@ -4,13 +4,14 @@ import sys
 import pandas as pd
 import plotly.graph_objects as go
 
-from money_over_time import MoneyOverTime
+from src.money_over_time import MoneyOverTime
 
 
 def configure_plot_command(parser):
     parser.add_argument(
         "-f", "--file",
         type=str,
+        required=True,
         help="CSV containing all transactions path"
     )
     parser.add_argument(
@@ -58,9 +59,16 @@ def configure_plot_command(parser):
 
 def configure_diff_command(parser):
     parser.add_argument(
-        "-s", "--source_file",
+        "--source_file",
         type=str,
+        required=True,
         help="CSV containing all transactions path"
+    )
+    parser.add_argument(
+        "--source_separator",
+        type=str,
+        nargs="?",
+        help="Column separator, default \",\""
     )
     parser.add_argument(
         "-a", "--account",
@@ -89,7 +97,14 @@ def configure_diff_command(parser):
     parser.add_argument(
         "-r", "--reference_file",
         type=str,
+        required=True,
         help="CSV containing all transactions path"
+    )
+    parser.add_argument(
+        "--reference_separator",
+        type=str,
+        nargs="?",
+        help="Column separator, default \",\""
     )
     parser.add_argument(
         "--reference_date_format",
@@ -116,7 +131,7 @@ class Main:
         program_desc = "A tool to manage and analyze financial records."
         self.parser = argparse.ArgumentParser(description=program_desc)
 
-        subparsers = self.parser.add_subparsers(dest="command", help="Available commands")
+        subparsers = self.parser.add_subparsers(dest="command", help="Available commands", required=True)
         plot_parser = subparsers.add_parser("plot", help="Reads movements from a CSV file and shows a plot graph of the capital's trend over time.")
         diff_parser = subparsers.add_parser("diff", help="Compares two sets of financial records to find discrepancies.")
 
@@ -125,13 +140,8 @@ class Main:
 
         self.args = self.parser.parse_args()
 
-        file = self.args.file
-        if file is None:
-            print("A file path is required. Use --help.")
-            sys.exit(1)
-
         self.money = MoneyOverTime(
-            file,
+            self.args.file,
             self.args.separator,
             self.args.date_format,
             self.args.date_label,
