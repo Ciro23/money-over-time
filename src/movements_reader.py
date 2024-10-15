@@ -1,6 +1,19 @@
 import csv
 from datetime import datetime
+from io import StringIO
 
+import pandas as pd
+
+
+def get_lines_of_xlsx(file_path: str) -> list:
+    df = pd.read_excel(file_path, engine='openpyxl')
+    csv_buffer = StringIO()
+
+    df.to_csv(csv_buffer, encoding='utf-8', index=False)
+    csv_buffer.seek(0)
+
+    pd.read_csv(csv_buffer)
+    return csv_buffer.getvalue().splitlines()
 
 def get_lines_of_file(file_path: str) -> list:
     with open(file_path, "r", encoding="utf-8-sig") as file:
