@@ -2,6 +2,7 @@ from typing import Optional
 
 from src.cell import Cell
 from src.date_cell import DateCell
+from src.movements import *
 from src.movements_reader import *
 
 
@@ -10,23 +11,6 @@ def round_amounts(entries: dict) -> dict:
         entries[date] = round(amount, 2)
 
     return entries
-
-def keep_only_entries_of_account(
-        account_index: int,
-        value_to_match: str,
-        separator: str,
-        rows: list
-) -> list:
-    rows_of_account = []
-    for row in rows:
-        columns = get_row_cells(separator, row)
-
-        skip: str = columns[account_index]
-        if skip.lower() == value_to_match.lower():
-            rows_of_account.append(row)
-
-    return rows_of_account
-
 
 def get_movement_entries(
         file_path: str,
@@ -39,11 +23,9 @@ def get_movement_entries(
     try:
         if file_path.endswith(".xlsx"):
             rows = get_lines_of_xlsx(file_path)
-
-            # Fuck pandas
             date_format = "%Y-%m-%d"
         else:
-            rows: list = get_lines_of_file(file_path)
+            rows: list = get_lines_of_text_file(file_path)
     except FileNotFoundError as e:
         raise FileNotFoundError(e)
 
@@ -62,23 +44,22 @@ def get_movement_entries(
                 separator,
                 rows_without_header
             )
-
-        entries: dict = get_movement_entries_per_date(
-            separator,
-            rows_without_header,
-            date_index,
-            date_format,
-            amount_index
-        )
-
-        # Fixing pandas mistakes...
-        if file_path.endswith(".xlsx"):
-            entries = change_entries_date_format(date_format, date_cell.date_format, entries)
-
-        return round_amounts(entries)
     except ValueError as e:
         raise ValueError(e)
 
+    entries: dict = get_movement_entries_per_date(
+        rows_without_header,
+        separator,
+        date_index,
+        date_format,
+        amount_index
+    )
+
+    # Fixing pandas mistakes...
+    if file_path.endswith(".xlsx"):
+        entries = change_entries_date_format(date_format, date_cell.date_format, entries)
+
+    return round_amounts(entries)
 
 class DiffOverTime:
     def __init__(
@@ -86,13 +67,15 @@ class DiffOverTime:
             source_file_path: str,
             reference_file_path: str,
             source_account: str,
-            source_account_label: Optional[str] = "account",
-            source_separator: Optional[str] = ",",
-            source_date: Optional[DateCell] = DateCell("%d/%m/%Y", "date"),
-            source_amount_label: Optional[str] = "amount",
-            reference_separator: Optional[str] = ",",
-            reference_date: Optional[DateCell] = DateCell("%d/%m/%Y", "date"),
-            reference_amount_label: Optional[str] = "amount",
+            source_account_label: Optional[str] = None,
+            source_separator: Optional[str] = None,
+            source_date_format: Optional[str] = None,
+            source_date_label: Optional[str] = None,
+            source_amount_label: Optional[str] = None,
+            reference_separator: Optional[str] = None,
+            reference_date_format: Optional[str] = None,
+            reference_date_label: Optional[str] = None,
+            reference_amount_label: Optional[str] = None,
     ):
         self.source_file_path = source_file_path
         self.source_separator = source_separator if source_separator is not None else ","
@@ -100,13 +83,19 @@ class DiffOverTime:
             source_account_label if source_account_label is not None else "account",
             source_account
         )
-        self.source_date = source_date
+        self.source_date = DateCell(
+            source_date_label if source_date_label is not None else "date",
+            source_date_format if source_date_format is not None else "%d/%m/%Y",
+        )
         self.source_amount_label = source_amount_label if source_amount_label is not None else "amount"
 
         self.reference_file_path = reference_file_path
         self.reference_separator = reference_separator if reference_separator is not None else ","
-        self.reference_date = reference_date
-        self.reference_amount_label = reference_amount_label
+        self.reference_date = DateCell(
+            reference_date_label if reference_date_label is not None else "date",
+            reference_date_format if reference_date_format is not None else "%d/%m/%Y",
+        )
+        self.reference_amount_label = reference_amount_label if reference_amount_label is not None else "amount"
 
     def get_diff_over_time(self):
         """

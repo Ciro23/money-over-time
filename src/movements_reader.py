@@ -5,7 +5,33 @@ from io import StringIO
 import pandas as pd
 
 
+def get_movement_entries_per_date(
+        rows: list,
+        delimiter: str,
+        date_index: int,
+        date_format: str,
+        amount_index: int
+) -> dict:
+    amount_per_date: dict = {}
+    for row in rows:
+        columns = get_row_cells(delimiter, row)
+
+        date = columns[date_index]
+        amount = columns[amount_index]
+        float_amount = float(amount)
+
+        if date in amount_per_date:
+            amount_per_date[date] += float_amount
+        else:
+            amount_per_date[date] = float_amount
+
+    return sort_by_date_keys(date_format, amount_per_date)
+
 def get_lines_of_xlsx(file_path: str) -> list:
+    """
+    WARNING: all cells containing dates will be automatically converted
+    using the format "%Y-%m-%d" by Pandas!
+    """
     df = pd.read_excel(file_path, engine='openpyxl')
     csv_buffer = StringIO()
 
@@ -15,7 +41,7 @@ def get_lines_of_xlsx(file_path: str) -> list:
     pd.read_csv(csv_buffer)
     return csv_buffer.getvalue().splitlines()
 
-def get_lines_of_file(file_path: str) -> list:
+def get_lines_of_text_file(file_path: str) -> list:
     with open(file_path, "r", encoding="utf-8-sig") as file:
         return file.read().splitlines()
 
@@ -38,28 +64,6 @@ def get_index_of_cell(cell_value: str, cells: list) -> int:
     raise ValueError(f"Could not find the index of the cell with label '{cell_value}'"
                      " Check if the specified value match the one in the csv file.")
 
-def get_movement_entries_per_date(
-        separator: str,
-        rows: list,
-        date_index: int,
-        date_format: str,
-        amount_index: int
-) -> dict:
-    amount_per_date: dict = {}
-    for row in rows:
-        columns = get_row_cells(separator, row)
-
-        date = columns[date_index]
-        amount = columns[amount_index]
-        float_amount = float(amount)
-
-        if date in amount_per_date:
-            amount_per_date[date] += float_amount
-        else:
-            amount_per_date[date] = float_amount
-
-    return sort_by_date_keys(date_format, amount_per_date)
-
 def sort_by_date_keys(date_format: str, dictionary: dict) -> dict:
     """
     All movements must be sorted chronologically by the
@@ -71,20 +75,3 @@ def sort_by_date_keys(date_format: str, dictionary: dict) -> dict:
             key=lambda x: datetime.strptime(x[0], date_format)
         )
     )
-
-def change_entries_date_format(
-        current_date_format: str,
-        new_date_format: str,
-        entries: dict
-) -> dict:
-    """
-    This function is useful when working with two sets of movement entries, using
-    different date formats, so that one can be adapted to the other.
-    """
-    entries_with_formatted_date = {}
-    for date_str, amount in entries.items():
-        date_obj = datetime.strptime(date_str, current_date_format)
-        formatted_date = date_obj.strftime(new_date_format)
-        entries_with_formatted_date[formatted_date] = amount
-
-    return entries_with_formatted_date

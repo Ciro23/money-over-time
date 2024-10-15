@@ -218,28 +218,21 @@ class Main:
                 print(message)
             return
 
-        show_graph(money_over_time.date['format'], amount_of_money_over_time)
+        show_graph(money_over_time.date.date_format, amount_of_money_over_time)
 
     def __execute_diff_over_time(self):
-        source_date = DateCell(
-            self.args.source_date_label if self.args.source_date_label is not None else "date",
-            self.args.source_date_format if self.args.source_date_format is not None else "%d/%m/%Y",
-        )
-        reference_date = DateCell(
-            self.args.reference_date_label if self.args.reference_date_label is not None else "date",
-            self.args.reference_date_format if self.args.reference_date_format is not None else "%d/%m/%Y",
-        )
-
         diff_over_time = DiffOverTime(
             self.args.source_file,
             self.args.reference_file,
             self.args.account,
             self.args.account_label,
             self.args.source_separator,
-            source_date,
+            self.args.source_date_format,
+            self.args.source_date_label,
             self.args.source_amount_label,
             self.args.reference_separator,
-            reference_date,
+            self.args.reference_date_format,
+            self.args.reference_date_label,
             self.args.reference_amount_label
         )
 
