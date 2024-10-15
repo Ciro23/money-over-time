@@ -28,7 +28,6 @@ def get_index_of_cell(cell_value: str, cells: list) -> int:
     only need to memorize the human-readable value inside them.
     This method is case-insensitive.
     """
-
     index = 0
     for cell in cells:
         if cell.lower() == cell_value.lower():
@@ -39,7 +38,7 @@ def get_index_of_cell(cell_value: str, cells: list) -> int:
     raise ValueError(f"Could not find the index of the cell with label '{cell_value}'"
                      " Check if the specified value match the one in the csv file.")
 
-def get_entries_per_date(
+def get_movement_entries_per_date(
         separator: str,
         rows: list,
         date_index: int,
@@ -72,3 +71,20 @@ def sort_by_date_keys(date_format: str, dictionary: dict) -> dict:
             key=lambda x: datetime.strptime(x[0], date_format)
         )
     )
+
+def change_entries_date_format(
+        current_date_format: str,
+        new_date_format: str,
+        entries: dict
+) -> dict:
+    """
+    This function is useful when working with two sets of movement entries, using
+    different date formats, so that one can be adapted to the other.
+    """
+    entries_with_formatted_date = {}
+    for date_str, amount in entries.items():
+        date_obj = datetime.strptime(date_str, current_date_format)
+        formatted_date = date_obj.strftime(new_date_format)
+        entries_with_formatted_date[formatted_date] = amount
+
+    return entries_with_formatted_date

@@ -8,7 +8,6 @@ def sum_total(entries: dict) -> dict:
     this function calculates a cumulative total amount and updates each entry
     to reflect the running total up to that date.
     """
-
     total = 0
     for date, amount in entries.items():
         total += amount
@@ -69,7 +68,7 @@ class MoneyOverTime:
         rows_without_header = rows[1:]
         rows_without_entries_to_skip = self.__remove_entries_to_skip(rows_without_header)
 
-        entries: dict = get_entries_per_date(
+        entries: dict = get_movement_entries_per_date(
             self.separator,
             rows_without_entries_to_skip,
             self.date['index'],
@@ -84,7 +83,6 @@ class MoneyOverTime:
         It's possible to exclude some movements based on some column value. For example,
         this may be useful when movements of an investment account should not be considered.
         """
-
         rows_without_entries_to_skip = []
         for row in rows:
             columns = get_row_cells(self.separator, row)

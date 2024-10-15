@@ -28,19 +28,20 @@ def keep_only_entries_of_account(
     return rows_of_account
 
 
-def get_entries_over_time(
+def get_movement_entries(
         file_path: str,
         separator: str,
         date_cell: DateCell,
         amount_label: str,
         account: Optional[Cell]
 ):
+    date_format = date_cell.date_format
     try:
         if file_path.endswith(".xlsx"):
             rows = get_lines_of_xlsx(file_path)
 
-            # Fuck pandas!
-            date_cell.date_format = "%Y-%m-%d"
+            # Fuck pandas
+            date_format = "%Y-%m-%d"
         else:
             rows: list = get_lines_of_file(file_path)
     except FileNotFoundError as e:
@@ -62,13 +63,18 @@ def get_entries_over_time(
                 rows_without_header
             )
 
-        entries: dict = get_entries_per_date(
+        entries: dict = get_movement_entries_per_date(
             separator,
             rows_without_header,
             date_index,
-            date_cell.date_format,
+            date_format,
             amount_index
         )
+
+        # Fixing pandas mistakes...
+        if file_path.endswith(".xlsx"):
+            entries = change_entries_date_format(date_format, date_cell.date_format, entries)
+
         return round_amounts(entries)
     except ValueError as e:
         raise ValueError(e)
@@ -110,7 +116,7 @@ class DiffOverTime:
         financial movements against a reference dataset, allowing to identify potential
         accountability errors.
         """
-        source_entries = get_entries_over_time(
+        source_entries = get_movement_entries(
             self.source_file_path,
             self.source_separator,
             self.source_date,
@@ -118,7 +124,7 @@ class DiffOverTime:
             self.source_account
         )
 
-        reference_entries = get_entries_over_time(
+        reference_entries = get_movement_entries(
             self.reference_file_path,
             self.reference_separator,
             self.reference_date,
@@ -126,14 +132,14 @@ class DiffOverTime:
             None
         )
 
-        # fuck pandas! todo: explain why panda wants to convert your dates!!!
-        converted_reference_entries = {}
-        for date_str, amount in reference_entries.items():
-            date_obj = datetime.strptime(date_str, self.reference_date.date_format)
-            formatted_date = date_obj.strftime(self.source_date.date_format)
-            converted_reference_entries[formatted_date] = amount
+        if self.source_date.date_format != self.reference_date.date_format:
+            reference_entries = change_entries_date_format(
+                self.reference_date.date_format,
+                self.source_date.date_format,
+                reference_entries
+            )
 
-        return self.__find_differences(source_entries, converted_reference_entries)
+        return self.__find_differences(source_entries, reference_entries)
 
     def __find_differences(self, dict1: dict, dict2: dict) -> dict:
         discrepancies = {}
