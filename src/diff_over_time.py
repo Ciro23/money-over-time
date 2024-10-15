@@ -100,8 +100,8 @@ class DiffOverTime:
     def get_diff_over_time(self):
         """
         Calculates the differences in financial entries over time
-        between a source file and a reference file.
-        This method is designed to help tracking differences in recorded
+        between a source file and a reference one.
+        This method is designed to help tracking differences in manually recorded
         financial movements against a reference dataset, allowing to identify potential
         accountability errors.
         """
