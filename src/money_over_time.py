@@ -1,7 +1,7 @@
+from movements import remove_entries_to_skip
+from movements_reader import get_index_of_cell, get_lines_of_text_file, get_movement_entries_per_date, get_row_cells
 from src.cell import Cell
 from src.date_cell import DateCell
-from src.movements import *
-from src.movements_reader import *
 from typing import Optional
 
 

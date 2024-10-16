@@ -3,7 +3,6 @@ import argparse
 import pandas as pd
 import plotly.graph_objects as go
 
-from src.date_cell import DateCell
 from src.diff_over_time import DiffOverTime
 from src.money_over_time import MoneyOverTime
 
