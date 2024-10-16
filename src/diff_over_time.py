@@ -1,12 +1,12 @@
-from typing import Optional
+from typing import Dict, Optional
 
-from movements import change_entries_date_format, keep_only_entries_of_account
-from movements_reader import get_index_of_cell, get_lines_of_text_file, get_lines_of_xlsx, get_movement_entries_per_date, get_row_cells, sort_by_date_keys
+from src.movements import change_entries_date_format, keep_only_entries_of_account
+from src.movements_reader import get_index_of_cell, get_lines_of_text_file, get_lines_of_xlsx, get_movement_entries_per_date, get_row_cells, sort_by_date_keys
 from src.cell import Cell
 from src.date_cell import DateCell
 
 
-def round_amounts(entries: dict) -> dict:
+def round_amounts(entries: Dict[str, str]) -> dict:
     for date, amount in entries.items():
         entries[date] = round(amount, 2)
 
@@ -25,7 +25,7 @@ def get_movement_entries(
             rows = get_lines_of_xlsx(file_path)
             date_format = "%Y-%m-%d"
         else:
-            rows: list = get_lines_of_text_file(file_path)
+            rows = get_lines_of_text_file(file_path)
     except FileNotFoundError as e:
         raise FileNotFoundError(e)
 
@@ -47,7 +47,7 @@ def get_movement_entries(
     except ValueError as e:
         raise ValueError(e)
 
-    entries: dict = get_movement_entries_per_date(
+    entries = get_movement_entries_per_date(
         rows_without_header,
         separator,
         date_index,
@@ -130,7 +130,7 @@ class DiffOverTime:
 
         return self.__find_differences(source_entries, reference_entries)
 
-    def __find_differences(self, dict1: dict, dict2: dict) -> dict:
+    def __find_differences(self, dict1: Dict[str, str], dict2: Dict[str, str]) -> dict:
         discrepancies = {}
 
         for date in dict1:

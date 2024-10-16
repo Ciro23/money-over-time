@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Dict, List
 
 from src.movements_reader import get_row_cells
 
@@ -6,7 +7,7 @@ from src.movements_reader import get_row_cells
 def change_entries_date_format(
         current_date_format: str,
         new_date_format: str,
-        entries: dict
+        entries: Dict[str, str]
 ) -> dict:
     """
     This function is useful when working with two sets of movement entries, using
@@ -24,8 +25,8 @@ def remove_entries_to_skip(
         account_index: int,
         value_to_match: str,
         separator: str,
-        rows: list
-) -> list:
+        rows: List[str]
+) -> List[str]:
     """
     It's possible to exclude some movements based on some column value. For example,
     this may be useful when movements of an investment account should not be considered.
@@ -50,8 +51,8 @@ def keep_only_entries_of_account(
         account_index: int,
         value_to_match: str,
         separator: str,
-        rows: list
-) -> list:
+        rows: List[str]
+) -> List[str]:
     rows_of_account = []
     for row in rows:
         columns = get_row_cells(separator, row)

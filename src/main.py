@@ -1,4 +1,5 @@
 import argparse
+from typing import Dict
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -138,7 +139,7 @@ def configure_diff_command(parser):
     )
 
 
-def show_graph(date_format: str, money_over_time: dict):
+def show_graph(date_format: str, money_over_time: Dict[str, str]):
     """
     Plotly is used to display an interactive graph.
     """
@@ -205,7 +206,7 @@ class Main:
         )
 
         try:
-            amount_of_money_over_time: dict = money_over_time.get_money_over_time()
+            amount_of_money_over_time = money_over_time.get_money_over_time()
         except FileNotFoundError:
             print("File not found!")
             return
@@ -236,7 +237,7 @@ class Main:
         )
 
         try:
-            differences_over_time: dict = diff_over_time.get_diff_over_time()
+            differences_over_time = diff_over_time.get_diff_over_time()
         except FileNotFoundError as e:
             message = "File not found!"
             print(message)

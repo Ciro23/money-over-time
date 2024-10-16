@@ -1,11 +1,11 @@
-from movements import remove_entries_to_skip
-from movements_reader import get_index_of_cell, get_lines_of_text_file, get_movement_entries_per_date, get_row_cells
+from src.movements import remove_entries_to_skip
+from src.movements_reader import get_index_of_cell, get_lines_of_text_file, get_movement_entries_per_date, get_row_cells
 from src.cell import Cell
 from src.date_cell import DateCell
-from typing import Optional
+from typing import Dict, Optional
 
 
-def sum_total(entries: dict) -> dict:
+def sum_total(entries: Dict[str, str]) -> dict:
     """
     Given a dictionary of movement entries with dates as keys and amounts as values,
     this function calculates a cumulative total amount and updates each entry
@@ -49,7 +49,7 @@ class MoneyOverTime:
         of all movements, for that day, as the value.
         """
         try:
-            rows: list = get_lines_of_text_file(self.file_path)
+            rows = get_lines_of_text_file(self.file_path)
         except FileNotFoundError as e:
             raise FileNotFoundError(e)
 
@@ -71,7 +71,7 @@ class MoneyOverTime:
         except ValueError as e:
             raise ValueError(e)
 
-        entries: dict = get_movement_entries_per_date(
+        entries = get_movement_entries_per_date(
             rows_without_header,
             self.separator,
             date_index,

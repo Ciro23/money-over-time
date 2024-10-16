@@ -1,3 +1,4 @@
+from typing import Dict, List
 import csv
 from datetime import datetime
 from io import StringIO
@@ -6,13 +7,13 @@ import pandas as pd
 
 
 def get_movement_entries_per_date(
-        rows: list,
+        rows: List[str],
         delimiter: str,
         date_index: int,
         date_format: str,
         amount_index: int
 ) -> dict:
-    amount_per_date: dict = {}
+    amount_per_date = {}
     for row in rows:
         columns = get_row_cells(delimiter, row)
 
@@ -27,7 +28,7 @@ def get_movement_entries_per_date(
 
     return sort_by_date_keys(date_format, amount_per_date)
 
-def get_lines_of_xlsx(file_path: str) -> list:
+def get_lines_of_xlsx(file_path: str) -> List[str]:
     """
     WARNING: all cells containing dates will be automatically converted
     using the format "%Y-%m-%d" by Pandas!
@@ -41,14 +42,14 @@ def get_lines_of_xlsx(file_path: str) -> list:
     pd.read_csv(csv_buffer)
     return csv_buffer.getvalue().splitlines()
 
-def get_lines_of_text_file(file_path: str) -> list:
+def get_lines_of_text_file(file_path: str) -> List[str]:
     with open(file_path, "r", encoding="utf-8-sig") as file:
         return file.read().splitlines()
 
-def get_row_cells(separator: str, row: str) -> list:
+def get_row_cells(separator: str, row: str) -> List[str]:
     return next(csv.reader([row], delimiter=separator))
 
-def get_index_of_cell(cell_value: str, cells: list) -> int:
+def get_index_of_cell(cell_value: str, cells: List[str]) -> int:
     """
     It's necessary to retrieve the index of cells given their label, so users
     only need to memorize the human-readable value inside them.
@@ -64,7 +65,7 @@ def get_index_of_cell(cell_value: str, cells: list) -> int:
     raise ValueError(f"Could not find the index of the cell with label '{cell_value}'"
                      " Check if the specified value match the one in the csv file.")
 
-def sort_by_date_keys(date_format: str, dictionary: dict) -> dict:
+def sort_by_date_keys(date_format: str, dictionary: Dict[str, str]) -> Dict[str, str]:
     """
     All movements must be sorted chronologically by the
     date they were made.
