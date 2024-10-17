@@ -5,7 +5,7 @@ It's helpful to whoever tracks financial movements because of the two main featu
 2. `diff`: tracks all accountability errors between a source set of financial records and a reference file (for example between a manually updated CSV/XLSX file and the bank document with all the actual records).
 
 This program can read both CSV and XLSX files, which are going to be referenced as "record files" in this document.  
-It's required that record files contain column headers in the first rows, which must include a column to indicate when movements occurred and another one with the amount: the date format and the name of such columns are arbitrary and can be later specified when using this program.
+It's required that record files contain column headers in the first rows, which must include a column to indicate when movements occurred and another one with the amount: the date format and the name of such columns are arbitrary and can be later specified when using this program.  
 Example records file:
 ```
 id,date,amount
@@ -14,17 +14,21 @@ id,date,amount
 3,3/12,2023,-50
 ```
 ## Usage
-### Default parameters
-The default column delimiter is a comma ",".  
-The default date format is "%d/%m/%Y".  
-The default label for date and amount are "date" and "amount" respectively.  
+#### Case sensitiveness
+When specifying the label of the date and amount column, the parameters are handled in a case-insensitive manner.
+#### Default parameters
+There are the default values used when their respective parameters are not specified:  
+- Column delimiter: ",";
+- Date format: "%d/%m/%Y";  
+- Date label: "date";
+- Amount label: "amount".
 
 ### Plot
 To show the graph, use the `plot` command:
 ```shell
 money-over-time plot --file "/path/to/your/csv/or/xlsx/file.csv"
 ```
-By specifying only the file path, the default value is used for all the other parameters, which can be customized using:
+Optional parameters can be customized using:
 ```shell
 money-over-time \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
@@ -41,7 +45,6 @@ money-over-time \
     --skip_label "account" \
     --skip_value "debit card"
 ```
-All string parameters for column labels are handled in a case-insensitive manner.
 ### Diff
 The `diff` command requires a source records file to be compared against a reference one.
 ## Building from source
