@@ -16,28 +16,28 @@ def configure_plot_command(parser):
         help="CSV containing all transactions path"
     )
     parser.add_argument(
-        "-s", "--separator",
+        "-d", "--delimiter",
         type=str,
         nargs="?",
-        help="Column separator, default \",\""
+        help="Delimiter used to distinguish a cell from another, default \",\""
     )
     parser.add_argument(
         "--date_format",
         type=str,
         nargs="?",
-        help="Date format used in the CSV file, default \"%%d/%%m/%%Y\""
+        help="Date format used in the records file, default \"%%d/%%m/%%Y\""
     )
     parser.add_argument(
         "--date_label",
         type=str,
         nargs="?",
-        help="Date label used in the CSV file, default \"date\""
+        help="Date label used in the records file, default \"date\""
     )
     parser.add_argument(
         "--amount_label",
         type=str,
         nargs="?",
-        help="Amount label used in the CSV file, default \"amount\""
+        help="Amount label used in the records file, default \"amount\""
     )
     parser.add_argument(
         "--skip_label",
@@ -66,15 +66,15 @@ def configure_diff_command(parser):
         help="CSV containing all transactions path"
     )
     parser.add_argument(
-        "--source_separator",
+        "--source_delimiter",
         type=str,
         nargs="?",
-        help="Column separator, default \",\""
+        help="Delimiter used to distinguish a cell from another in the source file, default \",\""
     )
     parser.add_argument(
         "--account_label",
         type=str,
-        help="Account label used in the source CSV file, default \"account\""
+        help="Account label used in the source records file, default \"account\""
     )
     parser.add_argument(
         "-a", "--account",
@@ -86,19 +86,19 @@ def configure_diff_command(parser):
         "--source_date_format",
         type=str,
         nargs="?",
-        help="Date format used in the source CSV file, default \"%%d/%%m/%%Y\""
+        help="Date format used in the source records file, default \"%%d/%%m/%%Y\""
     )
     parser.add_argument(
         "--source_date_label",
         type=str,
         nargs="?",
-        help="Date label used in the source CSV file, default \"date\""
+        help="Date label used in the source records file, default \"date\""
     )
     parser.add_argument(
         "--source_amount_label",
         type=str,
         nargs="?",
-        help="Amount label used in the source CSV file, default \"amount\""
+        help="Amount label used in the source records file, default \"amount\""
     )
 
     parser.add_argument(
@@ -108,40 +108,40 @@ def configure_diff_command(parser):
         help="CSV containing all transactions path"
     )
     parser.add_argument(
-        "--reference_separator",
+        "--reference_delimiter",
         type=str,
         nargs="?",
-        help="Column separator, default \",\""
+        help="Delimiter used to distinguish a cell from another in the reference file, default \",\""
     )
     parser.add_argument(
         "--reference_date_format",
         type=str,
         nargs="?",
-        help="Date format used in the reference CSV file, default \"%%d/%%m/%%Y\""
+        help="Date format used in the reference records file, default \"%%d/%%m/%%Y\""
     )
     parser.add_argument(
         "--reference_date_label",
         type=str,
         nargs="?",
-        help="Date label used in the reference CSV file, default \"date\""
+        help="Date label used in the reference records file, default \"date\""
     )
     parser.add_argument(
         "--reference_amount_label",
         type=str,
         nargs="?",
-        help="Amount label used in the reference CSV file, default \"amount\""
+        help="Amount label used in the reference records file, default \"amount\""
     )
 
     parser.add_argument(
         "-v", "--verbose",
         action="store_true",
-        help="Prints the actual Python error if something goes wrong while reading the file"
+        help="Prints the actual Python error if something goes wrong while reading the files"
     )
 
 
 def show_graph(date_format: str, money_over_time: Dict[str, str]):
     """
-    Plotly is used to display an interactive graph.
+    Plotly is used to display an interactive graph in the default installed browser.
     """
     data_frame = pd.DataFrame(list(money_over_time.items()), columns=['date', 'value'])
     data_frame['date'] = pd.to_datetime(data_frame['date'], format=date_format)
@@ -176,11 +176,11 @@ class Main:
         subparsers = self.parser.add_subparsers(dest="command", help="Available commands", required=True)
         plot_parser = subparsers.add_parser(
             "plot",
-            help="Reads movements from a CSV file and shows a plot graph of the capital's trend over time."
+            help="Reads movements from a records file (CSV or XLSX) and shows a plot graph of the capital's trend over time."
         )
         diff_parser = subparsers.add_parser(
             "diff",
-            help="Compares two sets of financial records to find discrepancies."
+            help="Compares two sets of financial records (CSV or XLSX) to find discrepancies."
         )
 
         configure_plot_command(plot_parser)
@@ -247,7 +247,7 @@ class Main:
                 print(message)
             return
         except ValueError as e:
-            message = "Error reading the file, check if parameters are correct, use --help for more."
+            message = "Error reading the files, check if parameters are correct, use --help for more."
             if self.args.verbose:
                 print(message, e)
             else:

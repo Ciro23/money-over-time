@@ -2,28 +2,29 @@
 A tool to manage and analyze financial records.  
 It's helpful to whoever tracks financial movements because of the two main features:
 1. `plot`: displays a plot graph showing the amount of money over time.
-2. `diff`: tracks all accountability errors between a source set of financial records and a reference file (for example between a manually updated CSV/XLSX file and the bank document with all the records)
+2. `diff`: tracks all accountability errors between a source set of financial records and a reference file (for example between a manually updated CSV/XLSX file and the bank document with all the actual records).
 
-This program can read both CSV and XLSX files, which are going to be referenced as "record files" in this document.
-
-## Usage
-### Plot
-The `plot` command reads a records file containing a list of movements/transactions, with at least two columns specified: one for the date and the other for the amount.  
-Example file:
+This program can read both CSV and XLSX files, which are going to be referenced as "record files" in this document.  
+It's required that record files contain column headers in the first rows, which must include a column to indicate when movements occurred and another one with the amount: the date format and the name of such columns are arbitrary and can be later specified when using this program.
+Example records file:
 ```
 id,date,amount
 1,1/12/2023,10
 2,2/12,2023,30
 3,3/12,2023,-50
 ```
-To show the plot graph, use:
-```shell
-money-over-time plot --file "/path/to/your/csv/or/xlsx/file.csv"
-```
+## Usage
+### Default parameters
 The default column delimiter is a comma ",".  
 The default date format is "%d/%m/%Y".  
 The default label for date and amount are "date" and "amount" respectively.  
-All these parameters can be customized using:
+
+### Plot
+To show the graph, use the `plot` command:
+```shell
+money-over-time plot --file "/path/to/your/csv/or/xlsx/file.csv"
+```
+By specifying only the file path, the default value is used for all the other parameters, which can be customized using:
 ```shell
 money-over-time \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
