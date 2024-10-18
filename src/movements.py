@@ -4,6 +4,56 @@ from typing import Dict, List
 from src.movements_reader import get_row_cells
 
 
+def get_movement_entries(
+        file_path: str,
+        delimiter: str,
+        date_cell: DateCell,
+        amount_label: str,
+        filtering_cell: Optional[Cell],
+        filter_callback
+):
+    date_format = date_cell.date_format
+    try:
+        if file_path.endswith(".xlsx"):
+            rows = get_lines_of_xlsx(file_path)
+            date_format = "%Y-%m-%d"
+        else:
+            rows = get_lines_of_text_file(file_path)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(e)
+
+    rows_without_header = rows[1:]
+
+    try:
+        column_headers = get_row_cells(delimiter, rows[0])
+        date_index = get_index_of_cell(date_cell.label, column_headers)
+        amount_index = get_index_of_cell(amount_label, column_headers)
+
+        if filtering_cell is not None:
+            filtering_cell_index = get_index_of_cell(filtering_cell.label, column_headers)
+            rows_without_header = filter_callback(
+                filtering_cell_index,
+                filtering_cell.value,
+                delimiter,
+                rows_without_header
+            )
+    except ValueError as e:
+        raise ValueError(e)
+
+    entries = get_movement_entries_per_date(
+        rows_without_header,
+        delimiter,
+        date_index,
+        date_format,
+        amount_index
+    )
+
+    # Fixing pandas mistakes...
+    if file_path.endswith(".xlsx"):
+        entries = change_entries_date_format(date_format, date_cell.date_format, entries)
+
+    return round_amounts(entries)
+
 def change_entries_date_format(
         current_date_format: str,
         new_date_format: str,
