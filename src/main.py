@@ -22,34 +22,34 @@ def configure_plot_command(parser):
         help="Delimiter used to distinguish a cell from another, default \",\""
     )
     parser.add_argument(
-        "--date_format",
+        "--date-format",
         type=str,
         nargs="?",
         help="Date format used in the records file, default \"%%d/%%m/%%Y\""
     )
     parser.add_argument(
-        "--date_label",
+        "--date-label",
         type=str,
         nargs="?",
         help="Date label used in the records file, default \"date\""
     )
     parser.add_argument(
-        "--amount_label",
+        "--amount-label",
         type=str,
         nargs="?",
         help="Amount label used in the records file, default \"amount\""
     )
     parser.add_argument(
-        "--skip_label",
+        "--exclude-label",
         type=str,
         nargs="?",
         help="The label of the column used to filter out some movements"
     )
     parser.add_argument(
-        "--skip_value",
+        "--exclude-value",
         type=str,
         nargs="?",
-        help="Based on the column label specified with \"--skip_label\", all"
+        help="Based on the column label specified with \"--exclude-label\", all"
              " rows which cell matches this value are not considered"
     )
     parser.add_argument(
@@ -66,67 +66,67 @@ def configure_diff_command(parser):
         help="CSV containing all transactions path"
     )
     parser.add_argument(
-        "--source_delimiter",
+        "--source-delimiter",
         type=str,
         nargs="?",
         help="Delimiter used to distinguish a cell from another in the source file, default \",\""
     )
     parser.add_argument(
-        "--account_label",
+        "--include-label",
         type=str,
-        help="Account label used in the source records file, default \"account\""
+        help="The label of the column used to filter in some movements, and exclude all the others"
     )
     parser.add_argument(
-        "-a", "--account",
+        "--include-value",
         type=str,
-        required=True,
-        help="The name of the account" # TODO: description. make generic instead of only "accounts"?
+        help="Based on the column label specified with \"--include-label\", all"
+             " rows which cell matches this value are the only ones considered"
     )
     parser.add_argument(
-        "--source_date_format",
+        "--source-date-format",
         type=str,
         nargs="?",
         help="Date format used in the source records file, default \"%%d/%%m/%%Y\""
     )
     parser.add_argument(
-        "--source_date_label",
+        "--source-date-label",
         type=str,
         nargs="?",
         help="Date label used in the source records file, default \"date\""
     )
     parser.add_argument(
-        "--source_amount_label",
+        "--source-amount-label",
         type=str,
         nargs="?",
         help="Amount label used in the source records file, default \"amount\""
     )
 
     parser.add_argument(
-        "-r", "--reference_file",
+        "-r", "--reference-file",
         type=str,
         required=True,
         help="CSV containing all transactions path"
     )
     parser.add_argument(
-        "--reference_delimiter",
+        "--reference-delimiter",
         type=str,
         nargs="?",
         help="Delimiter used to distinguish a cell from another in the reference file, default \",\""
     )
     parser.add_argument(
-        "--reference_date_format",
+        "--reference-date-format",
         type=str,
         nargs="?",
         help="Date format used in the reference records file, default \"%%d/%%m/%%Y\""
     )
     parser.add_argument(
-        "--reference_date_label",
+        "--reference-date-label",
         type=str,
         nargs="?",
         help="Date label used in the reference records file, default \"date\""
     )
     parser.add_argument(
-        "--reference_amount_label",
+        "--reference-amount-label",
         type=str,
         nargs="?",
         help="Amount label used in the reference records file, default \"amount\""

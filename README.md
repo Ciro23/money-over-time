@@ -18,7 +18,7 @@ id,date,amount
 When specifying the label of the date and amount column, the parameters are handled in a case-insensitive manner.
 #### Default parameters
 There are the default values used when their respective parameters are not specified:  
-- Column delimiter: ",";
+- Cells delimiter: ",";
 - Date format: "%d/%m/%Y";  
 - Date label: "date";
 - Amount label: "amount".
@@ -32,9 +32,9 @@ Optional parameters can be customized using:
 ```shell
 money-over-time \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
-    --separator ";" \
-    --date_label "custom date label" \
-    --date_format "%Y/%m/%d"
+    --delimiter ";" \
+    --date-label "custom date label" \
+    --date-format "%Y/%m/%d"
 ```
 It's also possible to filter out some movements based on the value of a specific column.
 For example, if the records file contains a column named "account" and you want to filter out
@@ -42,8 +42,8 @@ all the rows which account is "debit card", you can use:
 ```shell
 money-over-time \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
-    --skip_label "account" \
-    --skip_value "debit card"
+    --exclude-label "account" \
+    --exclude-value "debit card"
 ```
 ### Diff
 The `diff` command requires a source records file to be compared against a reference one.
