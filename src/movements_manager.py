@@ -4,7 +4,7 @@ from typing import List, Optional, Callable
 from src.types.cell import Cell
 from src.types.date_cell import DateCell
 from src.types.entries import Movements
-from src.movements_reader import get_row_cells, read_lines_of_xlsx, read_lines_of_text_file, get_index_of_cell, \
+from src.movements_parser import get_row_cells, read_lines_of_xlsx, read_lines_of_text_file, get_index_of_cell, \
     parse_movements
 
 

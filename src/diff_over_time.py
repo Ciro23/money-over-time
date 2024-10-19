@@ -3,7 +3,7 @@ from typing import Optional
 from src.types.cell import Cell
 from src.types.date_cell import DateCell
 from src.types.entries import Movements
-from src.movements import change_movements_date_format, get_movements, exclude_all_except, \
+from src.movements_manager import change_movements_date_format, get_movements, exclude_all_except, \
     sort_movements_by_date
 
 

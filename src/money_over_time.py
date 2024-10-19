@@ -3,7 +3,7 @@ from typing import Optional
 from src.types.cell import Cell
 from src.types.date_cell import DateCell
 from src.types.entries import Movements
-from src.movements import get_movements, include_all_except, round_and_sum_total
+from src.movements_manager import get_movements, include_all_except, round_and_sum_total
 
 
 class MoneyOverTime:
