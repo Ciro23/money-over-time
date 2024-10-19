@@ -25,6 +25,8 @@ These are the default values used when their respective arguments are not specif
 - Date format: "%d/%m/%Y";  
 - Date label: "date";
 - Amount label: "amount".
+#### Troubleshooting
+Add the `-v` or `--verbose` argument to print a more detailed error message in case of problems.
 
 ### Plot
 To show the graph, use the `plot` command:
@@ -86,7 +88,7 @@ This program is compatible and tested with Python 3.11 and this guide assumes yo
 2. Navigate to the repository directory.
 3. Create a virtual environment:
     ```shell
-    python3.10 -m venv venv
+    python3.11 -m venv venv
     source venv/bin/activate
     ```
 4. Install all pip dependencies using:

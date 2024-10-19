@@ -10,7 +10,7 @@ import openpyxl # noqa: F401
 
 import pandas as pd
 
-from src.types.entries import Movements
+from src.types.movements import Movements
 
 
 def read_lines_of_xlsx(file_path: str) -> List[str]:

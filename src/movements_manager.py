@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Dict
 
 from src.types.cell import Cell
 from src.types.date_cell import DateCell
-from src.types.entries import Movements
+from src.types.movements import Movements
 from src.movements_parser import get_row_cells, read_lines_of_xlsx, read_lines_of_text_file, get_index_of_cell, \
     parse_movements
 
@@ -44,7 +44,7 @@ def get_movements(
     except ValueError as e:
         raise ValueError(e)
 
-    movements = sort_movements_by_date(
+    movements = sort_dictionary_by_keys(
         parse_movements(
             rows_without_header,
             delimiter,
@@ -161,7 +161,7 @@ def exclude_all_except(
     return filtered_rows
 
 
-def sort_movements_by_date(movements: Movements, date_format: str) -> Movements:
+def sort_dictionary_by_keys(movements: Dict[str, any], date_format: str) -> Dict[str, any]:
     """
     All movements must be sorted chronologically by the date they were made.
     """

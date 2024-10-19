@@ -1,10 +1,10 @@
-from typing import Optional
+from typing import Optional, Dict
 
 from src.types.cell import Cell
 from src.types.date_cell import DateCell
-from src.types.entries import Movements
+from src.types.movements import Movements
 from src.movements_manager import change_movements_date_format, get_movements, exclude_all_except, \
-    sort_movements_by_date
+    sort_dictionary_by_keys
 
 
 def get_diff_over_time(
@@ -17,7 +17,7 @@ def get_diff_over_time(
         reference_delimiter: Optional[str] = None,
         reference_date_cell: Optional[DateCell] = None,
         reference_amount_label: Optional[str] = None,
-):
+) -> Dict[str, Dict[str, float]]:
     """
     Calculates the differences in financial entries over time
     between a source file and a reference one.
@@ -57,44 +57,44 @@ def get_diff_over_time(
         )
 
     differences_over_time = __find_differences(source_movements, reference_movements)
-    return sort_movements_by_date(differences_over_time, source_date_cell.date_format)
+    return sort_dictionary_by_keys(differences_over_time, source_date_cell.date_format)
 
 
-def print_differences(differences_over_time: dict) -> None:
-    print("Discrepancies found:")
+def print_differences(differences_over_time: Dict[str, Dict[str, float]]) -> None:
+    print("Differences found:")
     for date, values in differences_over_time.items():
-        dict1_value = values['dict1']
-        dict2_value = values['dict2']
+        source_value = values['source']
+        reference_value = values['reference']
 
-        if dict1_value is None:
+        if source_value is None:
             print(f"# {date}"
                   f"\n   Source: Not available"
-                  f"\n   Reference: {dict2_value:.2f}")
-        elif dict2_value is None:
+                  f"\n   Reference: {reference_value:+.2f}")
+        elif reference_value is None:
             print(f"# {date}"
-                  f"\n   Source: {dict1_value:.2f}"
+                  f"\n   Source: {source_value:+.2f}"
                   f"\n   Reference: Not available")
         else:
             print(
                 f"# {date}"
-                f"\n   Source: {dict1_value:.2f}"
-                f"\n   Reference: {dict2_value:.2f}"
-                f"\n   Difference: {dict2_value - dict1_value:.2f}")
+                f"\n   Source: {source_value:+.2f}"
+                f"\n   Reference: {reference_value:+.2f}"
+                f"\n   Diff. (ref - src): {reference_value - source_value:+.2f}")
 
         print("--------------------------------------")
 
 
-def __find_differences(source_movements: Movements, reference_movements: Movements) -> dict:
+def __find_differences(source_movements: Movements, reference_movements: Movements) -> Dict[str, Dict[str, float]]:
     discrepancies = {}
 
     for date in source_movements:
         if date not in reference_movements:
-            discrepancies[date] = {"dict1": source_movements[date], "dict2": None}
+            discrepancies[date] = {"source": source_movements[date], "reference": None}
         elif date in reference_movements and source_movements[date] != reference_movements[date]:
-            discrepancies[date] = {"dict1": source_movements[date], "dict2": reference_movements[date]}
+            discrepancies[date] = {"source": source_movements[date], "reference": reference_movements[date]}
 
     for date in reference_movements:
         if date not in source_movements:
-            discrepancies[date] = {"dict1": None, "dict2": reference_movements[date]}
+            discrepancies[date] = {"source": None, "reference": reference_movements[date]}
 
     return discrepancies

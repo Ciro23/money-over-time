@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 
 from src.types.cell import Cell
 from src.types.date_cell import DateCell
-from src.types.entries import Movements
+from src.types.movements import Movements
 from src.movements_manager import get_movements, include_all_except, round_and_sum_total
 
 
