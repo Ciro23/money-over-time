@@ -16,8 +16,8 @@ id,date,amount
 ## Usage
 #### Case sensitiveness
 When specifying the label of the date and amount column, the parameters are handled in a case-insensitive manner.
-#### Default parameters
-There are the default values used when their respective parameters are not specified:  
+#### Default arguments
+There are the default values used when their respective arguments are not specified:  
 - Cells delimiter: ",";
 - Date format: "%d/%m/%Y";  
 - Date label: "date";
@@ -28,7 +28,7 @@ To show the graph, use the `plot` command:
 ```shell
 money-over-time plot --file "/path/to/your/csv/or/xlsx/file.csv"
 ```
-Optional parameters can be customized using:
+Optional arguments can be customized using:
 ```shell
 money-over-time \
     --file "/path/to/your/csv/or/xlsx/file.csv" \

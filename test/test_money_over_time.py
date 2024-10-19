@@ -1,19 +1,20 @@
 import os
 import unittest
 
-from src.money_over_time import MoneyOverTime
+from src.money_over_time import get_money_over_time
+from src.types.cell import Cell
+from src.types.date_cell import DateCell
 
 
 class MoneyOverTimeTest(unittest.TestCase):
 
-    def test_default_parameters(self):
+    def test_default_arguments(self):
         """
-        Movements are read from a file with the default parameters (date label,
-        date format, amount label, separator character...)
+        Movements are read from a file with the default arguments (date label,
+        date format, amount label, delimiter character...)
         """
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
-        money_over_time = MoneyOverTime(file_path)
-        money_by_date = money_over_time.get_money_over_time()
+        money_by_date = get_money_over_time(file_path)
 
         expected = {
             "15/06/2024": 65,
@@ -28,12 +29,11 @@ class MoneyOverTimeTest(unittest.TestCase):
         The column labels should be case-insensitive.
         """
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
-        money_over_time = MoneyOverTime(
+        money_by_date = get_money_over_time(
             file_path,
-            date_label="DATE",
+            date_cell=DateCell("DATE"),
             amount_label="aMoUnT"
         )
-        money_by_date = money_over_time.get_money_over_time()
 
         expected = {
             "15/06/2024": 65,
@@ -49,8 +49,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         word or phrase.
         """
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
-        money_over_time = MoneyOverTime(file_path, skip_label="account", skip_value="cash")
-        money_by_date = money_over_time.get_money_over_time()
+        money_by_date = get_money_over_time(file_path, excluding_cell=Cell("account", "cash"))
 
         expected = {
             "16/06/2024": -15,
@@ -61,14 +60,12 @@ class MoneyOverTimeTest(unittest.TestCase):
 
     def test_custom_properties(self):
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_custom_properties.csv')
-        money_over_time = MoneyOverTime(
+        money_by_date = get_money_over_time(
             file_path,
-            separator=";",
-            date_format="%m/%d/%Y",
-            date_label="data",
+            delimiter=";",
+            date_cell=DateCell("data", "%m/%d/%Y"),
             amount_label="importo",
         )
-        money_by_date = money_over_time.get_money_over_time()
 
         expected = {
             "06/15/2024": 65,
@@ -86,8 +83,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         lots of rows to be wrongfully skipped.
         """
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_trailing_comma.csv')
-        money_over_time = MoneyOverTime(file_path)
-        money_by_date = money_over_time.get_money_over_time()
+        money_by_date = get_money_over_time(file_path)
 
         expected = {
             "15/06/2024": 65,
@@ -99,13 +95,12 @@ class MoneyOverTimeTest(unittest.TestCase):
 
     def test_comma_in_column_value(self):
         """
-        Columns can contain the same separator character, as long as the whole column
+        Columns can contain the same delimiter character, as long as the whole column
         value is quoted. This case caused errors because the columns were split manually,
         instead of using a proper csv library.
         """
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_comma_in_column_value.csv')
-        money_over_time = MoneyOverTime(file_path)
-        money_by_date = money_over_time.get_money_over_time()
+        money_by_date = get_money_over_time(file_path)
 
         expected = {
             "15/06/2024": 65,
