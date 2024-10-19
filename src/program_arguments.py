@@ -116,7 +116,7 @@ def __configure_diff_command(parser):
     )
 
     parser.add_argument(
-        "-r", "--reference-file",
+        "--reference-file",
         type=str,
         required=True,
         help="CSV containing all transactions path"

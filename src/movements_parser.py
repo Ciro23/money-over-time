@@ -1,6 +1,12 @@
 import csv
+import warnings
 from io import StringIO
 from typing import List
+
+# pipreqs does not include openpyxl in requirements.txt, unless
+# an explicit import is made. Do not remove this import!
+# noinspection PyUnusedImport
+import openpyxl # noqa: F401
 
 import pandas as pd
 
@@ -12,7 +18,10 @@ def read_lines_of_xlsx(file_path: str) -> List[str]:
     WARNING: all cells containing dates will be automatically converted
     using the format "%Y-%m-%d" by Pandas!
     """
-    df = pd.read_excel(file_path, engine='openpyxl')
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        df = pd.read_excel(file_path, engine='openpyxl')
+
     csv_buffer = StringIO()
 
     df.to_csv(csv_buffer, encoding='utf-8', index=False)

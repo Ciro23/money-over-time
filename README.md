@@ -2,22 +2,25 @@
 A tool to manage and analyze financial records.  
 It's helpful to whoever tracks financial movements because of the two main features:
 1. `plot`: displays a plot graph showing the amount of money over time.
-2. `diff`: tracks all accountability errors between a source set of financial records and a reference file (for example between a manually updated CSV/XLSX file and the bank document with all the actual records).
+2. `diff`: tracks all accountability errors between a source set of financial records and a reference file (for example
+between a manually updated CSV/XLSX file and the document exported from the bank website with all the actual records).
 
 This program can read both CSV and XLSX files, which are going to be referenced as "record files" in this document.  
-It's required that record files contain column headers in the first rows, which must include a column to indicate when movements occurred and another one with the amount: the date format and the name of such columns are arbitrary and can be later specified when using this program.  
+It's required that record files contain column headers in the first rows, which must include a column to indicate when
+movements occurred and another one with the amount: the date format and the name of such columns are arbitrary as they
+can be later customized when using this program.  
 Example records file:
 ```
-id,date,amount
-1,1/12/2023,10
-2,2/12,2023,30
-3,3/12,2023,-50
+id,date,amount,account
+1,1/12/2023,10,cash
+2,2/12,2023,30,cash
+3,3/12,2023,-50,debit card
 ```
 ## Usage
 #### Case sensitiveness
-When specifying the label of the date and amount column, the parameters are handled in a case-insensitive manner.
+When specifying the label of the date and amount column, the values are handled in a case-insensitive manner.
 #### Default arguments
-There are the default values used when their respective arguments are not specified:  
+These are the default values used when their respective arguments are not specified:  
 - Cells delimiter: ",";
 - Date format: "%d/%m/%Y";  
 - Date label: "date";
@@ -30,26 +33,56 @@ money-over-time plot --file "/path/to/your/csv/or/xlsx/file.csv"
 ```
 Optional arguments can be customized using:
 ```shell
-money-over-time \
+money-over-time plot \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
     --delimiter ";" \
+    --date-format "%Y/%m/%d" \
     --date-label "custom date label" \
-    --date-format "%Y/%m/%d"
+    --amount-label "custom amount label"
 ```
 It's also possible to filter out some movements based on the value of a specific column.
 For example, if the records file contains a column named "account" and you want to filter out
 all the rows which account is "debit card", you can use:
 ```shell
-money-over-time \
+money-over-time plot \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
     --exclude-label "account" \
     --exclude-value "debit card"
 ```
 ### Diff
-The `diff` command requires a source records file to be compared against a reference one.
+The `diff` command requires a source records file to be compared against a reference one:
+```shell
+money-over-time diff \
+    --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
+    --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv"
+```
+Optional arguments can be customized using:
+```shell
+money-over-time diff \
+    --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
+    --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv" \
+    --source-delimiter ";" \
+    --source-date-format "%Y/%m/%d" \
+    --source-date-label "custom date label" \
+    --source-amount-label "custom amount label" \
+    --reference-delimiter ";" \
+    --reference-date-format "%Y/%m/%d" \
+    --reference-date-label "custom date label" \
+    --reference-amount-label "custom amount label"
+```
+It's also possible to filter only on some movements based on the value of a specific column.
+For example, if the source records file contains a column named "account" and you want to filter only on
+the rows which account is "debit card", you can use:
+```shell
+money-over-time diff \
+    --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
+    --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv" \
+    --include-label "account" \
+    --include-value "debit card"
+```
 ## Building from source
-This program is compatible and tested with Python 3.10 and this guide assumes you're using Linux or macOS.
-1. Download Python 3.10 using your package manager or from the official website.
+This program is compatible and tested with Python 3.11 and this guide assumes you're using Linux or macOS.
+1. Download Python 3.11 using your package manager or from the official website.
 2. Navigate to the repository directory.
 3. Create a virtual environment:
     ```shell
@@ -68,6 +101,11 @@ This program is compatible and tested with Python 3.10 and this guide assumes yo
    ```shell
     python -m unittest discover -s test
     ```
+7. Generate `requirements.txt`
+   ```shell
+   pip install pipreqs
+   pipreqs ./ --force
+   ```
 
 ## Gallery
 ![Figure1](https://github.com/user-attachments/assets/3bfcfae2-c956-41bc-9c36-c3702a4fcfd2)
