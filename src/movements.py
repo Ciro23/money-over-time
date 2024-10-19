@@ -1,24 +1,28 @@
 from datetime import datetime
-from typing import Dict, List
+from typing import List, Optional, Callable
 
-from src.movements_reader import get_row_cells
+from src.types.cell import Cell
+from src.types.date_cell import DateCell
+from src.types.entries import Movements
+from src.movements_reader import get_row_cells, read_lines_of_xlsx, read_lines_of_text_file, get_index_of_cell, \
+    parse_movements
 
 
-def get_movement_entries(
+def get_movements(
         file_path: str,
         delimiter: str,
         date_cell: DateCell,
         amount_label: str,
-        filtering_cell: Optional[Cell],
-        filter_callback
-):
+        filtering_cell: Optional[Cell] = None,
+        filter_callback: Optional[Callable[[int, str, str, List[str]], List[str]]] = None
+) -> Movements:
     date_format = date_cell.date_format
     try:
         if file_path.endswith(".xlsx"):
-            rows = get_lines_of_xlsx(file_path)
+            rows = read_lines_of_xlsx(file_path)
             date_format = "%Y-%m-%d"
         else:
-            rows = get_lines_of_text_file(file_path)
+            rows = read_lines_of_text_file(file_path)
     except FileNotFoundError as e:
         raise FileNotFoundError(e)
 
@@ -40,75 +44,130 @@ def get_movement_entries(
     except ValueError as e:
         raise ValueError(e)
 
-    entries = get_movement_entries_per_date(
-        rows_without_header,
-        delimiter,
-        date_index,
-        date_format,
-        amount_index
+    movements = sort_movements_by_date(
+        parse_movements(
+            rows_without_header,
+            delimiter,
+            date_index,
+            amount_index
+        ),
+        date_format
     )
 
     # Fixing pandas mistakes...
     if file_path.endswith(".xlsx"):
-        entries = change_entries_date_format(date_format, date_cell.date_format, entries)
+        movements = change_movements_date_format(date_format, date_cell.date_format, movements)
 
-    return round_amounts(entries)
+    return round_amounts(movements)
 
-def change_entries_date_format(
+
+def change_movements_date_format(
         current_date_format: str,
         new_date_format: str,
-        entries: Dict[str, str]
-) -> dict:
+        movements: Movements
+) -> Movements:
     """
     This function is useful when working with two sets of movement entries, using
     different date formats, so that one can be adapted to the other.
     """
-    entries_with_formatted_date = {}
-    for date_str, amount in entries.items():
+    movements_with_formatted_date = {}
+    for date_str, amount in movements.items():
         date_obj = datetime.strptime(date_str, current_date_format)
         formatted_date = date_obj.strftime(new_date_format)
-        entries_with_formatted_date[formatted_date] = amount
+        movements_with_formatted_date[formatted_date] = amount
 
-    return entries_with_formatted_date
+    return movements_with_formatted_date
 
-def remove_entries_to_skip(
-        account_index: int,
+
+def round_amounts(movements: Movements) -> Movements:
+    """
+    Each amount is rounded to 2 decimals.
+    """
+    for date, amount in movements.items():
+        movements[date] = round(amount, 2)
+
+    return movements
+
+
+def round_and_sum_total(movements: Movements) -> Movements:
+    """
+    Given a dictionary of movement entries with dates as keys and amounts as values,
+    this function calculates a cumulative total amount and updates each entry
+    to reflect the running total up to that date.
+    Each total is rounded to 2 decimals.
+    """
+    total = 0
+    for date, amount in movements.items():
+        total += amount
+        movements[date] = round(total, 2)
+
+    return movements
+
+
+def include_all_except(
+        except_cell_index: int,
         value_to_match: str,
-        separator: str,
+        delimiter: str,
         rows: List[str]
 ) -> List[str]:
     """
-    It's possible to exclude some movements based on some column value. For example,
-    this may be useful when movements of an investment account should not be considered.
+    This may be useful when movements of an investment account should not be considered.
+    :param except_cell_index: The index of the cell that must be checked.
+    :param value_to_match: The value to check against for the cell which index was specified.
+    :param delimiter: Cells delimiter (usually "," or ";").
+    :param rows: Movement rows read from the records file.
+    :return: All movement rows except the ones which the specified cell matches a certain value.
     """
-    rows_without_entries_to_skip = []
+    filtered_rows = []
     for row in rows:
-        columns = get_row_cells(separator, row)
+        columns = get_row_cells(delimiter, row)
 
         # If the index of the "column to skip" has been set,
         # then the value in the cell of this row must be checked,
         # so that it's skipped if there's a match.
-        if account_index >= 0:
-            skip: str = columns[account_index]
+        if except_cell_index >= 0:
+            skip: str = columns[except_cell_index]
             if skip.lower() == value_to_match.lower():
                 continue
 
-        rows_without_entries_to_skip.append(row)
+        filtered_rows.append(row)
 
-    return rows_without_entries_to_skip
+    return filtered_rows
 
-def keep_only_entries_of_account(
-        account_index: int,
+
+def exclude_all_except(
+        except_cell_index: int,
         value_to_match: str,
-        separator: str,
+        delimiter: str,
         rows: List[str]
 ) -> List[str]:
-    rows_of_account = []
+    """
+    This may be useful when only movements of a specific account should be
+    considered.
+    :param except_cell_index: The index of the cell that must be checked.
+    :param value_to_match: The value to check against for the cell which index was specified.
+    :param delimiter: Cells delimiter (usually "," or ";").
+    :param rows: Movement rows read from the records file.
+    :return: All movement rows which the specified cell does not match a certain value.
+    """
+    filtered_rows = []
     for row in rows:
-        columns = get_row_cells(separator, row)
+        columns = get_row_cells(delimiter, row)
 
-        skip: str = columns[account_index]
+        skip: str = columns[except_cell_index]
         if skip.lower() == value_to_match.lower():
-            rows_of_account.append(row)
+            filtered_rows.append(row)
 
-    return rows_of_account
+    return filtered_rows
+
+
+def sort_movements_by_date(movements: Movements, date_format: str) -> Movements:
+    """
+    All movements must be sorted chronologically by the date they were made.
+    """
+    return dict(
+        sorted(
+            movements.items(),
+            key=lambda x: datetime.strptime(x[0], date_format)
+        )
+    )

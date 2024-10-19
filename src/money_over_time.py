@@ -1,22 +1,9 @@
-from src.movements import remove_entries_to_skip
-from src.movements_reader import get_index_of_cell, get_lines_of_text_file, get_movement_entries_per_date, get_row_cells
-from src.cell import Cell
-from src.date_cell import DateCell
-from typing import Dict, Optional
+from typing import Optional
 
-
-def sum_total(entries: Dict[str, str]) -> dict:
-    """
-    Given a dictionary of movement entries with dates as keys and amounts as values,
-    this function calculates a cumulative total amount and updates each entry
-    to reflect the running total up to that date.
-    """
-    total = 0
-    for date, amount in entries.items():
-        total += amount
-        entries[date] = round(total, 2)
-
-    return entries
+from src.types.cell import Cell
+from src.types.date_cell import DateCell
+from src.types.entries import Movements
+from src.movements import get_movements, include_all_except, round_and_sum_total
 
 
 class MoneyOverTime:
@@ -37,46 +24,23 @@ class MoneyOverTime:
             date_format if date_format is not None else "%d/%m/%Y",
         )
         self.amount_label = amount_label if amount_label is not None else "amount"
-        self.skip_cell = Cell(
+        self.excluding_cell = Cell(
             skip_label if skip_label is not None else "",
             skip_value if skip_value is not None else "",
         )
 
-    def get_money_over_time(self) -> dict:
+    def get_money_over_time(self) -> Movements:
         """
         Reads all the movements in the specified file and returns a dict
         with the date of the movement as the key and the sum of the amount
         of all movements, for that day, as the value.
         """
-        try:
-            rows = get_lines_of_text_file(self.file_path)
-        except FileNotFoundError as e:
-            raise FileNotFoundError(e)
-
-        rows_without_header = rows[1:]
-
-        try:
-            column_headers = get_row_cells(self.separator, rows[0])
-            date_index = get_index_of_cell(self.date.label, column_headers)
-            amount_index = get_index_of_cell(self.amount_label, column_headers)
-
-            if self.skip_cell.value != "":
-                skip_cell_index = get_index_of_cell(self.skip_cell.label, column_headers)
-                rows_without_header = remove_entries_to_skip(
-                    skip_cell_index,
-                    self.skip_cell.value,
-                    self.separator,
-                    rows_without_header
-                )
-        except ValueError as e:
-            raise ValueError(e)
-
-        entries = get_movement_entries_per_date(
-            rows_without_header,
+        movements = get_movements(
+            self.file_path,
             self.separator,
-            date_index,
-            self.date.date_format,
-            amount_index
+            self.date,
+            self.amount_label,
+            self.excluding_cell,
+            include_all_except
         )
-
-        return sum_total(entries)
+        return round_and_sum_total(movements)

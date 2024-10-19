@@ -1,65 +1,11 @@
-from typing import Dict, Optional
+from typing import Optional
 
-from src.movements import change_entries_date_format, keep_only_entries_of_account
-from src.movements_reader import get_index_of_cell, get_lines_of_text_file, get_lines_of_xlsx, get_movement_entries_per_date, get_row_cells, sort_by_date_keys
-from src.cell import Cell
-from src.date_cell import DateCell
+from src.types.cell import Cell
+from src.types.date_cell import DateCell
+from src.types.entries import Movements
+from src.movements import change_movements_date_format, get_movements, exclude_all_except, \
+    sort_movements_by_date
 
-
-def round_amounts(entries: Dict[str, str]) -> dict:
-    for date, amount in entries.items():
-        entries[date] = round(amount, 2)
-
-    return entries
-
-def get_movement_entries(
-        file_path: str,
-        separator: str,
-        date_cell: DateCell,
-        amount_label: str,
-        account: Optional[Cell]
-):
-    date_format = date_cell.date_format
-    try:
-        if file_path.endswith(".xlsx"):
-            rows = get_lines_of_xlsx(file_path)
-            date_format = "%Y-%m-%d"
-        else:
-            rows = get_lines_of_text_file(file_path)
-    except FileNotFoundError as e:
-        raise FileNotFoundError(e)
-
-    rows_without_header = rows[1:]
-
-    try:
-        column_headers = get_row_cells(separator, rows[0])
-        date_index = get_index_of_cell(date_cell.label, column_headers)
-        amount_index = get_index_of_cell(amount_label, column_headers)
-
-        if account is not None:
-            account_index = get_index_of_cell(account.label, column_headers)
-            rows_without_header = keep_only_entries_of_account(
-                account_index,
-                account.value,
-                separator,
-                rows_without_header
-            )
-    except ValueError as e:
-        raise ValueError(e)
-
-    entries = get_movement_entries_per_date(
-        rows_without_header,
-        separator,
-        date_index,
-        date_format,
-        amount_index
-    )
-
-    # Fixing pandas mistakes...
-    if file_path.endswith(".xlsx"):
-        entries = change_entries_date_format(date_format, date_cell.date_format, entries)
-
-    return round_amounts(entries)
 
 class DiffOverTime:
     def __init__(
@@ -105,42 +51,42 @@ class DiffOverTime:
         financial movements against a reference dataset, allowing to identify potential
         accountability errors.
         """
-        source_entries = get_movement_entries(
+        source_movements = get_movements(
             self.source_file_path,
             self.source_separator,
             self.source_date,
             self.source_amount_label,
-            self.source_account
+            self.source_account,
+            exclude_all_except
         )
 
-        reference_entries = get_movement_entries(
+        reference_movements = get_movements(
             self.reference_file_path,
             self.reference_separator,
             self.reference_date,
-            self.reference_amount_label,
-            None
+            self.reference_amount_label
         )
 
         if self.source_date.date_format != self.reference_date.date_format:
-            reference_entries = change_entries_date_format(
+            reference_movements = change_movements_date_format(
                 self.reference_date.date_format,
                 self.source_date.date_format,
-                reference_entries
+                reference_movements
             )
 
-        return self.__find_differences(source_entries, reference_entries)
+        return self.__find_differences(source_movements, reference_movements)
 
-    def __find_differences(self, dict1: Dict[str, str], dict2: Dict[str, str]) -> dict:
+    def __find_differences(self, source_movements: Movements, reference_movements: Movements) -> dict:
         discrepancies = {}
 
-        for date in dict1:
-            if date not in dict2:
-                discrepancies[date] = {"dict1": dict1[date], "dict2": None}
-            elif date in dict2 and dict1[date] != dict2[date]:
-                discrepancies[date] = {"dict1": dict1[date], "dict2": dict2[date]}
+        for date in source_movements:
+            if date not in reference_movements:
+                discrepancies[date] = {"dict1": source_movements[date], "dict2": None}
+            elif date in reference_movements and source_movements[date] != reference_movements[date]:
+                discrepancies[date] = {"dict1": source_movements[date], "dict2": reference_movements[date]}
 
-        for date in dict2:
-            if date not in dict1:
-                discrepancies[date] = {"dict1": None, "dict2": dict2[date]}
+        for date in reference_movements:
+            if date not in source_movements:
+                discrepancies[date] = {"dict1": None, "dict2": reference_movements[date]}
 
-        return sort_by_date_keys(self.source_date.date_format, discrepancies)
+        return sort_movements_by_date(discrepancies, self.source_date.date_format)

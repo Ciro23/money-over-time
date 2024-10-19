@@ -1,34 +1,13 @@
-from typing import Dict, List
 import csv
-from datetime import datetime
 from io import StringIO
+from typing import List
 
 import pandas as pd
 
+from src.types.entries import Movements
 
-def get_movement_entries_per_date(
-        rows: List[str],
-        delimiter: str,
-        date_index: int,
-        date_format: str,
-        amount_index: int
-) -> dict:
-    amount_per_date = {}
-    for row in rows:
-        columns = get_row_cells(delimiter, row)
 
-        date = columns[date_index]
-        amount = columns[amount_index]
-        float_amount = float(amount)
-
-        if date in amount_per_date:
-            amount_per_date[date] += float_amount
-        else:
-            amount_per_date[date] = float_amount
-
-    return sort_by_date_keys(date_format, amount_per_date)
-
-def get_lines_of_xlsx(file_path: str) -> List[str]:
+def read_lines_of_xlsx(file_path: str) -> List[str]:
     """
     WARNING: all cells containing dates will be automatically converted
     using the format "%Y-%m-%d" by Pandas!
@@ -42,17 +21,52 @@ def get_lines_of_xlsx(file_path: str) -> List[str]:
     pd.read_csv(csv_buffer)
     return csv_buffer.getvalue().splitlines()
 
-def get_lines_of_text_file(file_path: str) -> List[str]:
+
+def read_lines_of_text_file(file_path: str) -> List[str]:
     with open(file_path, "r", encoding="utf-8-sig") as file:
         return file.read().splitlines()
 
-def get_row_cells(separator: str, row: str) -> List[str]:
-    return next(csv.reader([row], delimiter=separator))
+
+def parse_movements(
+        rows: List[str],
+        delimiter: str,
+        date_index: int,
+        amount_index: int
+) -> Movements:
+    """
+    After reading the movements from a CSV or XLSX file, it's necessary
+    to parse them into a more useful format.
+    :param rows: Each row is a string of comma separated values, containing
+                 at least an amount and the date the movement was made.
+    :param delimiter: Cells delimiter (usually "," or ";").
+    :param date_index: Zero based index of the cell containing the date.
+    :param amount_index: Zero based index of the cell containing the amount.
+    :return: The parsed movements by the date they were made.
+    """
+    amount_per_date = {}
+    for row in rows:
+        columns = get_row_cells(delimiter, row)
+
+        date = columns[date_index]
+        amount = columns[amount_index]
+        float_amount = float(amount)
+
+        if date in amount_per_date:
+            amount_per_date[date] += float_amount
+        else:
+            amount_per_date[date] = float_amount
+
+    return amount_per_date
+
+
+def get_row_cells(delimiter: str, row: str) -> List[str]:
+    return next(csv.reader([row], delimiter=delimiter))
+
 
 def get_index_of_cell(cell_value: str, cells: List[str]) -> int:
     """
-    It's necessary to retrieve the index of cells given their label, so users
-    only need to memorize the human-readable value inside them.
+    It's necessary to retrieve the index of cells given their value, so
+    users only need to memorize the human-readable value inside them.
     This method is case-insensitive.
     """
     index = 0
@@ -62,17 +76,5 @@ def get_index_of_cell(cell_value: str, cells: List[str]) -> int:
 
         index += 1
 
-    raise ValueError(f"Could not find the index of the cell with label '{cell_value}'"
-                     " Check if the specified value match the one in the csv file.")
-
-def sort_by_date_keys(date_format: str, dictionary: Dict[str, str]) -> Dict[str, str]:
-    """
-    All movements must be sorted chronologically by the
-    date they were made.
-    """
-    return dict(
-        sorted(
-            dictionary.items(),
-            key=lambda x: datetime.strptime(x[0], date_format)
-        )
-    )
+    raise ValueError(f"Could not find the index of the cell with value '{cell_value}'"
+                     " Check if the specified value match the one in the CSV/XLSX file.")
