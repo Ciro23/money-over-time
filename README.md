@@ -31,11 +31,11 @@ Add the `-v` or `--verbose` argument to print a more detailed error message in c
 ### Plot
 To show the graph, use the `plot` command:
 ```shell
-money-over-time plot --file "/path/to/your/csv/or/xlsx/file.csv"
+mot plot --file "/path/to/your/csv/or/xlsx/file.csv"
 ```
 Optional arguments can be customized using:
 ```shell
-money-over-time plot \
+mot plot \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
     --delimiter ";" \
     --date-format "%Y/%m/%d" \
@@ -46,7 +46,7 @@ It's also possible to filter out some movements based on the value of a specific
 For example, if the records file contains a column named "account" and you want to filter out
 all the rows which account is "debit card", you can use:
 ```shell
-money-over-time plot \
+mot plot \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
     --exclude-label "account" \
     --exclude-value "debit card"
@@ -54,13 +54,13 @@ money-over-time plot \
 ### Diff
 The `diff` command requires a source records file to be compared against a reference one:
 ```shell
-money-over-time diff \
+mot diff \
     --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
     --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv"
 ```
 Optional arguments can be customized using:
 ```shell
-money-over-time diff \
+mot diff \
     --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
     --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv" \
     --source-delimiter ";" \
@@ -76,7 +76,7 @@ It's also possible to filter only on some movements based on the value of a spec
 For example, if the source records file contains a column named "account" and you want to filter only on
 the rows which account is "debit card", you can use:
 ```shell
-money-over-time diff \
+mot diff \
     --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
     --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv" \
     --include-label "account" \
@@ -97,11 +97,11 @@ This program is compatible and tested with Python 3.11 and this guide assumes yo
     ```
 5. Modify and execute the program with Python:
     ```shell
-    python -m src.main
+    python -m mot
     ```
 6. Run the unit tests with:
    ```shell
-    python -m unittest discover -s test
+    python -m unittest discover -s mot/tests
     ```
 7. Generate `requirements.txt`
    ```shell

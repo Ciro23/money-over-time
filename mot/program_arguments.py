@@ -1,7 +1,7 @@
 import argparse
 
 
-def parse_program_arguments():
+def parse_program_arguments() -> argparse.Namespace:
     program_desc = "A tool to manage and analyze financial records."
     parser = argparse.ArgumentParser(description=program_desc)
 
@@ -21,7 +21,7 @@ def parse_program_arguments():
     return parser.parse_args()
 
 
-def __configure_plot_command(parser):
+def __configure_plot_command(parser) -> None:
     parser.add_argument(
         "-f", "--file",
         type=str,
@@ -72,7 +72,7 @@ def __configure_plot_command(parser):
     )
 
 
-def __configure_diff_command(parser):
+def __configure_diff_command(parser) -> None:
     parser.add_argument(
         "--source-file",
         type=str,

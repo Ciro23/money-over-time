@@ -1,12 +1,12 @@
 from typing import Optional
 
 import pandas as pd
-import plotly.graph_objects as go
+import plotly.graph_objects as go # type: ignore
 
-from src.types.cell import Cell
-from src.types.date_cell import DateCell
-from src.types.movements import Movements
-from src.movements_manager import get_movements, include_all_except, round_and_sum_total
+from mot.types.cell import Cell
+from mot.types.date_cell import DateCell
+from mot.types.movements import Movements
+from mot.reader.movements_manager import get_movements, include_all_except, round_and_sum_total
 
 
 def get_money_over_time(
@@ -36,7 +36,7 @@ def get_money_over_time(
     return round_and_sum_total(movements)
 
 
-def show_graph(movements: Movements, date_format: str):
+def show_graph(movements: Movements, date_format: str) -> None:
     """
     Plotly is used to display an interactive graph in the default installed browser.
     """

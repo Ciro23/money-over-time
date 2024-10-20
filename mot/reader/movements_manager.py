@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import List, Optional, Callable, Dict
+from typing import List, Optional, Callable, Dict, Any
 
-from src.types.cell import Cell
-from src.types.date_cell import DateCell
-from src.types.movements import Movements
-from src.movements_parser import get_row_cells, read_lines_of_xlsx, read_lines_of_text_file, get_index_of_cell, \
+from mot.types.cell import Cell
+from mot.types.date_cell import DateCell
+from mot.types.movements import Movements
+from mot.reader.movements_parser import get_row_cells, read_lines_of_xlsx, read_lines_of_text_file, get_index_of_cell, \
     parse_movements
 
 
@@ -33,7 +33,7 @@ def get_movements(
         date_index = get_index_of_cell(date_cell.label, column_headers)
         amount_index = get_index_of_cell(amount_label, column_headers)
 
-        if filtering_cell is not None:
+        if filtering_cell is not None and filter_callback is not None:
             filtering_cell_index = get_index_of_cell(filtering_cell.label, column_headers)
             rows_without_header = filter_callback(
                 filtering_cell_index,
@@ -96,7 +96,7 @@ def round_and_sum_total(movements: Movements) -> Movements:
     to reflect the running total up to that date.
     Each total is rounded to 2 decimals.
     """
-    total = 0
+    total = 0.0
     for date, amount in movements.items():
         total += amount
         movements[date] = round(total, 2)
@@ -161,13 +161,13 @@ def exclude_all_except(
     return filtered_rows
 
 
-def sort_dictionary_by_keys(movements: Dict[str, any], date_format: str) -> Dict[str, any]:
+def sort_dictionary_by_keys(dictionary: Dict[str, Any], date_format: str) -> Dict[str, Any]:
     """
-    All movements must be sorted chronologically by the date they were made.
+    Sorts a dictionary, which uses dates as the keys, chronologically.
     """
     return dict(
         sorted(
-            movements.items(),
+            dictionary.items(),
             key=lambda x: datetime.strptime(x[0], date_format)
         )
     )

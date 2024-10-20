@@ -10,7 +10,7 @@ import openpyxl # noqa: F401
 
 import pandas as pd
 
-from src.types.movements import Movements
+from mot.types.movements import Movements
 
 
 def read_lines_of_xlsx(file_path: str) -> List[str]:
@@ -52,7 +52,7 @@ def parse_movements(
     :param amount_index: Zero based index of the cell containing the amount.
     :return: The parsed movements by the date they were made.
     """
-    amount_per_date = {}
+    amount_per_date: Movements = {}
     for row in rows:
         columns = get_row_cells(delimiter, row)
 

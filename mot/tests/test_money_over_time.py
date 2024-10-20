@@ -1,9 +1,9 @@
 import os
 import unittest
 
-from src.money_over_time import get_money_over_time
-from src.types.cell import Cell
-from src.types.date_cell import DateCell
+from mot.money_over_time import get_money_over_time
+from mot.types.cell import Cell
+from mot.types.date_cell import DateCell
 
 
 class MoneyOverTimeTest(unittest.TestCase):

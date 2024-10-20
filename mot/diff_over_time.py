@@ -1,9 +1,9 @@
 from typing import Optional, Dict
 
-from src.types.cell import Cell
-from src.types.date_cell import DateCell
-from src.types.movements import Movements
-from src.movements_manager import change_movements_date_format, get_movements, exclude_all_except, \
+from mot.types.cell import Cell
+from mot.types.date_cell import DateCell
+from mot.types.movements import Movements
+from mot.reader.movements_manager import change_movements_date_format, get_movements, exclude_all_except, \
     sort_dictionary_by_keys
 
 
@@ -63,8 +63,8 @@ def get_diff_over_time(
 def print_differences(differences_over_time: Dict[str, Dict[str, float]]) -> None:
     print("Differences found:")
     for date, values in differences_over_time.items():
-        source_value = values['source']
-        reference_value = values['reference']
+        source_value = values.get("source")
+        reference_value = values.get("reference")
 
         if source_value is None:
             print(f"# {date}"
@@ -84,17 +84,20 @@ def print_differences(differences_over_time: Dict[str, Dict[str, float]]) -> Non
         print("--------------------------------------")
 
 
-def __find_differences(source_movements: Movements, reference_movements: Movements) -> Dict[str, Dict[str, float]]:
+def __find_differences(
+        source_movements: Movements,
+        reference_movements: Movements
+) -> Dict[str, Dict[str, float]]:
     discrepancies = {}
 
     for date in source_movements:
         if date not in reference_movements:
-            discrepancies[date] = {"source": source_movements[date], "reference": None}
+            discrepancies[date] = {"source": source_movements[date]}
         elif date in reference_movements and source_movements[date] != reference_movements[date]:
             discrepancies[date] = {"source": source_movements[date], "reference": reference_movements[date]}
 
     for date in reference_movements:
         if date not in source_movements:
-            discrepancies[date] = {"source": None, "reference": reference_movements[date]}
+            discrepancies[date] = {"reference": reference_movements[date]}
 
     return discrepancies
