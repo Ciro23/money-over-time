@@ -1,4 +1,5 @@
 ## Introduction
+
 A tool to manage and analyze financial records.  
 It's helpful to whoever tracks financial movements because of the two main features:
 1. `plot`: displays a plot graph showing the amount of money over time.
@@ -17,18 +18,25 @@ id,date,amount,account
 3,3/12,2023,-50,debit card
 ```
 ## Usage
+
 #### Case sensitiveness
+
 When specifying the label of the date and amount column, the values are handled in a case-insensitive manner.
+
 #### Default arguments
+
 These are the default values used when their respective arguments are not specified:  
 - Cells delimiter: ",";
 - Date format: "%d/%m/%Y";  
 - Date label: "date";
 - Amount label: "amount".
+
 #### Troubleshooting
+
 Add the `-v` or `--verbose` argument to print a more detailed error message in case of problems.
 
 ### Plot
+
 To show the graph, use the `plot` command:
 ```shell
 mot plot --file "/path/to/your/csv/or/xlsx/file.csv"
@@ -51,7 +59,9 @@ mot plot \
     --exclude-label "account" \
     --exclude-value "debit card"
 ```
+
 ### Diff
+
 The `diff` command requires a source records file to be compared against a reference one:
 ```shell
 mot diff \
@@ -82,7 +92,9 @@ mot diff \
     --include-label "account" \
     --include-value "debit card"
 ```
+
 ## Building from source
+
 This program is compatible and tested with Python 3.11 and this guide assumes you're using Linux or macOS.
 1. Download Python 3.11 using your package manager or from the official website.
 2. Navigate to the repository directory.
@@ -103,11 +115,22 @@ This program is compatible and tested with Python 3.11 and this guide assumes yo
    ```shell
     python -m unittest discover -s mot/tests
     ```
-7. Generate `requirements.txt`
+7. Generate `requirements.txt`:
    ```shell
-   pip install pipreqs
-   pipreqs ./ --force
+   pip freeze > requirements.txt
    ```
+8. Use `mypy` to statically type check the code:
+   ```shell
+   mypy mot
+   ```
+9. Generate a single executable file:
+   ```shell
+   pyinstaller --onefile mot/__main__.py
+   ```
+   The generated executable will be placed inside `./dist`.  
+   > NOTE: This process must be executed on every platform where you want your application to run.  
+   Executables are platform-specific, so you'll need to build them separately for Linux, macOS, and Windows.
 
 ## Gallery
+
 ![Figure1](https://github.com/user-attachments/assets/3bfcfae2-c956-41bc-9c36-c3702a4fcfd2)

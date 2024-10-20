@@ -3,11 +3,6 @@ import warnings
 from io import StringIO
 from typing import List
 
-# pipreqs does not include openpyxl in requirements.txt, unless
-# an explicit import is made. Do not remove this import!
-# noinspection PyUnusedImport
-import openpyxl # noqa: F401
-
 import pandas as pd
 
 from mot.types.movements import Movements
