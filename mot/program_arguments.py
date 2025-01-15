@@ -3,7 +3,8 @@ import argparse
 
 def parse_program_arguments() -> argparse.Namespace:
     program_desc = "A tool to manage and analyze financial records."
-    parser = argparse.ArgumentParser(description=program_desc)
+    parser = argparse.ArgumentParser(prog="mot", description=program_desc)
+    parser.add_argument('--version', action='version', version='%(prog)s 2.1.0')
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands", required=True)
     plot_parser = subparsers.add_parser(
