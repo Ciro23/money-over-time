@@ -3,7 +3,7 @@
 A tool to manage and analyze financial records.  
 It's helpful to whoever tracks financial movements because of the two main features:
 1. `plot`: displays a plot graph showing the amount of money over time.
-2. `diff`: tracks all accountability errors between a source set of financial records and a reference file (for example
+2. `diff`: tracks all accounting errors between a source set of financial records and a reference file (for example
 between a manually updated CSV/XLSX file and the document exported from the bank website with all the actual records).
 
 This program can read both CSV and XLSX files, which are going to be referenced as "record files" in this document.  

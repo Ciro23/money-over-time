@@ -25,7 +25,7 @@ def get_diff_over_time(
     between a source file and a reference one.
     This method is designed to help tracking differences in manually recorded
     financial movements against a reference dataset, allowing to identify potential
-    accountability errors.
+    accounting errors.
     """
     source_delimiter = "," if source_delimiter is None else source_delimiter
     source_date_cell = DateCell() if source_date_cell is None else source_date_cell

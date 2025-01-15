@@ -14,7 +14,7 @@ def parse_program_arguments() -> argparse.Namespace:
     diff_parser = subparsers.add_parser(
         "diff",
         help="Compares two sets of financial records (CSV or XLSX) to find discrepancies."
-             " Useful to look for accountability errors."
+             " Useful to look for accounting errors."
     )
 
     __configure_plot_command(plot_parser)
