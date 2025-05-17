@@ -56,17 +56,28 @@ def __configure_plot_command(parser) -> None:
         help="Amount label used in the records file, default \"amount\""
     )
     parser.add_argument(
-        "--exclude-label",
+        "--filter-label",
         type=str,
         nargs="?",
-        help="The label of the column used to filter out some movements"
+        help="The label of the column used to filter in or out some movements."
+             " See --filter-mode"
     )
     parser.add_argument(
-        "--exclude-value",
+        "--filter-value",
         type=str,
         nargs="?",
-        help="Based on the column label specified with \"--exclude-label\", all"
-             " rows which cell matches this value are not considered"
+        help="Based on the column label specified with \"--filter-label\", rows"
+             " whose cell matches this value are not considered if --filter-mode"
+             " is 'out', otherwise they're the only considered rows if"
+             " --filter-mode is 'in'"
+    )
+    parser.add_argument(
+        "--filter-mode",
+        type=str,
+        nargs="?",
+        help="Use 'in' to consider only rows matching --filter-label and"
+             " --filter-value, or 'out' to exclude the matching rows. Default is"
+             " 'in'"
     )
     parser.add_argument(
         "-v", "--verbose",
@@ -89,17 +100,28 @@ def __configure_diff_command(parser) -> None:
         help="Delimiter used to distinguish a cell from another in the source records file, default \",\""
     )
     parser.add_argument(
-        "--include-label",
+        "--filter-label",
         type=str,
         nargs="?",
-        help="The label of the column used to filter in some movements, and exclude all the others"
+        help="The label of the column used to filter in or out some movements"
+             " in the source file. See --filter-mode"
     )
     parser.add_argument(
-        "--include-value",
+        "--filter-value",
         type=str,
         nargs="?",
-        help="Based on the column label specified with \"--include-label\", all"
-             " rows which cell matches this value are the only ones considered"
+        help="Based on the column label specified with \"--filter-label\", rows"
+             " in the source file whose cell matches this value are not considered"
+             " if --filter-mode is 'out', otherwise they're the only considered"
+             " rows if --filter-mode is 'in'"
+    )
+    parser.add_argument(
+        "--filter-mode",
+        type=str,
+        nargs="?",
+        help="Use 'in' to consider only rows matching --filter-label and"
+             " --filter-value, or 'out' to exclude the matching rows. Default"
+             " is 'in'"
     )
     parser.add_argument(
         "--source-date-format",

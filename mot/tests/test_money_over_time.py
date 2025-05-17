@@ -52,7 +52,7 @@ class MoneyOverTimeTest(unittest.TestCase):
         word or phrase.
         """
         file_path = os.path.join(os.path.dirname(__file__), 'resources/movements_default.csv')
-        money_by_date = get_money_over_time(file_path, excluding_cell=Cell("account", "cash"))
+        money_by_date = get_money_over_time(file_path, filtering_cell=Cell("account", "cash"), filter_mode="out")
 
         date_format = "%d/%m/%Y"
         expected = {

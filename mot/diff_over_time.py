@@ -1,19 +1,20 @@
 import pydoc
 from datetime import date
-from typing import Optional, Dict
+from typing import Literal, Optional, Dict
 
 from mot.types.cell import Cell
 from mot.types.date_cell import DateCell
 from mot.types.movements import Movements
 from mot.reader.movements_manager import get_movements, exclude_all_except, \
-    sort_dictionary_by_keys
+    include_all_except, sort_dictionary_by_keys
 
 
 def get_diff_over_time(
         source_file_path: str,
         reference_file_path: str,
         source_delimiter: Optional[str] = None,
-        source_including_cell: Optional[Cell] = None,
+        source_filtering_cell: Optional[Cell] = None,
+        source_filter_mode: Literal["in", "out"] = "in",
         source_date_cell: Optional[DateCell] = None,
         source_amount_label: Optional[str] = None,
         reference_delimiter: Optional[str] = None,
@@ -35,13 +36,17 @@ def get_diff_over_time(
     reference_date_cell = DateCell() if reference_date_cell is None else reference_date_cell
     reference_amount_label = "amount" if reference_amount_label is None else reference_amount_label
 
+    filter_callback = exclude_all_except
+    if source_filter_mode == "out":
+        filter_callback = include_all_except
+
     source_movements = get_movements(
         source_file_path,
         source_delimiter,
         source_date_cell,
         source_amount_label,
-        source_including_cell,
-        exclude_all_except
+        source_filtering_cell,
+        filter_callback
     )
 
     reference_movements = get_movements(

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import pandas as pd
 import plotly.graph_objects as go # type: ignore
@@ -6,7 +6,7 @@ import plotly.graph_objects as go # type: ignore
 from mot.types.cell import Cell
 from mot.types.date_cell import DateCell
 from mot.types.movements import Movements
-from mot.reader.movements_manager import get_movements, include_all_except, round_and_sum_total
+from mot.reader.movements_manager import exclude_all_except, get_movements, include_all_except, round_and_sum_total
 
 
 def get_money_over_time(
@@ -14,7 +14,8 @@ def get_money_over_time(
         delimiter: Optional[str] = None,
         date_cell: Optional[DateCell] = None,
         amount_label: Optional[str] = None,
-        excluding_cell: Optional[Cell] = None,
+        filtering_cell: Optional[Cell] = None,
+        filter_mode: Literal["in", "out"] = "in"
 ) -> Movements:
     """
     Reads all the movements in the specified file and returns a dict
@@ -25,13 +26,17 @@ def get_money_over_time(
     date_cell = DateCell() if date_cell is None else date_cell
     amount_label = "amount" if amount_label is None else amount_label
 
+    filter_callback = exclude_all_except
+    if filter_mode == "out":
+        filter_callback = include_all_except
+
     movements = get_movements(
         file_path,
         delimiter,
         date_cell,
         amount_label,
-        excluding_cell,
-        include_all_except
+        filtering_cell,
+        filter_callback
     )
     return round_and_sum_total(movements)
 

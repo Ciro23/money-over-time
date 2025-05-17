@@ -28,12 +28,12 @@ def __run_money_over_time(args: Namespace) -> bool:
         DEFAULT_DATE_FORMAT if args.date_format is None else args.date_format
     )
 
-    if args.exclude_label is None or args.exclude_value is None:
-        excluding_cell = None
+    if args.filter_label is None or args.filter_value is None:
+        filtering_cell = None
     else:
-        excluding_cell = Cell(
-            args.exclude_label,
-            args.exclude_value
+        filtering_cell = Cell(
+            args.filter_label,
+            args.filter_value
         )
 
     try:
@@ -42,7 +42,8 @@ def __run_money_over_time(args: Namespace) -> bool:
             args.delimiter,
             date_cell,
             args.amount_label,
-            excluding_cell
+            filtering_cell,
+            args.filter_mode
         )
     except FileNotFoundError:
         print("File not found!")
@@ -69,12 +70,12 @@ def __run_diff_over_time(args: Namespace) -> bool:
         DEFAULT_DATE_FORMAT if args.reference_date_format is None else args.reference_date_format
     )
 
-    if args.include_label is None or args.include_value is None:
-        including_cell = None
+    if args.filter_label is None or args.filter_value is None:
+        filtering_cell = None
     else:
-        including_cell = Cell(
-            args.include_label,
-            args.include_value
+        filtering_cell = Cell(
+            args.filter_label,
+            args.filter_value
         )
 
     try:
@@ -82,7 +83,8 @@ def __run_diff_over_time(args: Namespace) -> bool:
             args.source_file,
             args.reference_file,
             args.source_delimiter,
-            including_cell,
+            filtering_cell,
+            args.filter_mode,
             source_date_cell,
             args.source_amount_label,
             args.reference_delimiter,
