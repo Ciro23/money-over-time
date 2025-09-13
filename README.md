@@ -23,51 +23,51 @@ id,date,amount,account
 3,3/12,2023,-50,debit card
 ```
 
+## How to run
+
+This program is compatible and tested with Python 3.11 and this guide assumes you're using Linux or macOS (other Python
+versions should also be compatible, but warnings may be shown).
+
+1. Download Python 3.11 from your package manager, [pyenv](https://github.com/pyenv/pyenv), or the official website.
+2. Navigate to the repository directory.
+3. Create a virtual environment:
+
+    ```shell
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+4. Install all pip dependencies using:
+
+    ```shell
+    pip install -r requirements.txt
+    ```
+
+5. Execute the program with Python:
+
+    ```shell
+    python -m mot
+    ```
+
 ## Usage
-
-### How to run
-
-You can download and run the executables attached to each release in the [releases](https://github.com/Ciro23/money-over-time/releases)
-page or using the Python interpreter (refer to [Building from source](#building-from-source)).
-
-> In case of the executable running very slowly, it's recommended to run the script directly using Python.
-
-#### Case sensitiveness
-
-When specifying the label of the date and amount column, the values are handled in a case-insensitive manner.
-
-#### Default arguments
-
-These are the default values used when their respective arguments are not specified:
-
-- Cells delimiter: ",";
-- Date format: "%d/%m/%Y";  
-- Date label: "date";
-- Amount label: "amount".
-
-#### Troubleshooting
-
-Add the `-v` or `--verbose` argument to print a more detailed error message in case of problems.
 
 ### Plot
 
 To show the graph, use the `plot` command:
 
 ```shell
-mot plot --file "/path/to/your/csv/or/xlsx/file.csv"
-
+python -m mot plot --file "/path/to/your/csv/or/xlsx/file.csv"
 ```
 
 Optional arguments can be customized using:
 
 ```shell
-mot plot \
+python -m mot plot \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
     --delimiter ";" \
     --date-format "%Y/%m/%d" \
     --date-label "custom date label" \
     --amount-label "custom amount label"
-
 ```
 
 It's also possible to filter in or out some movements based on the value of a specific column.
@@ -75,7 +75,7 @@ For example, if the records file contains a column named "account" and you want 
 all the rows which account is "debit card", you can use:
 
 ```shell
-mot plot \
+python -m mot plot \
     --file "/path/to/your/csv/or/xlsx/file.csv" \
     --filter-label "account" \
     --filter-value "debit card"
@@ -87,7 +87,7 @@ mot plot \
 The `diff` command requires a source records file to be compared against a reference one:
 
 ```shell
-mot diff \
+python -m mot diff \
     --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
     --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv"
 ```
@@ -95,7 +95,7 @@ mot diff \
 Optional arguments can be customized using:
 
 ```shell
-mot diff \
+python -m mot diff \
     --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
     --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv" \
     --source-delimiter ";" \
@@ -113,7 +113,7 @@ For example, if the source records file contains a column named "account" and yo
 all the rows except the ones which account is "debit card", you can use:
 
 ```shell
-mot diff \
+python -m mot diff \
     --source-file "/path/to/your/csv/or/xlsx/source-file.csv" \
     --reference-file "/path/to/your/csv/or/xlsx/reference-file.csv" \
     --filter-label "account" \
@@ -121,68 +121,31 @@ mot diff \
     --filter-mode "in"
 ```
 
-## Building from source
+---
 
-This program is compatible and tested with Python 3.11 and this guide assumes you're using Linux or macOS (other Python
-versions should also be compatible, but warnings may be shown).
+### Case sensitiveness
 
-1. Download Python 3.11 using your package manager or from the official website.
-2. Navigate to the repository directory.
-3. Create a virtual environment:
+When specifying the label of the date and amount columns, the values are handled in a case-insensitive manner.
 
-    ```shell
-    python3.11 -m venv venv
-    source venv/bin/activate
-    ```
+### Default arguments
 
-4. Install all pip dependencies using:
+These are the default values used when their respective arguments are not specified:
 
-    ```shell
-    pip install -r requirements.txt
-    ```
+- Cells delimiter: ",";
+- Date format: "%d/%m/%Y";  
+- Date label: "date";
+- Amount label: "amount".
 
-5. Execute the program with Python:
+### Troubleshooting
 
-    ```shell
-    python -m mot
-
-    ```
-
-6. Run the unit tests with:
-
-   ```shell
-    python -m unittest discover -s mot/tests
-    ```
-
-7. Generate `requirements.txt`:
-
-   ```shell
-   pip freeze > requirements.txt
-   ```
-
-8. Use `mypy` to statically type check the code:
-
-   ```shell
-   mypy mot
-   ```
-
-9. Generate a single executable file:
-
-   ```shell
-   pyinstaller --onefile mot/__main__.py
-   ```
-
-   The generated executable will be placed inside `./dist`.  
-
-   > NOTE: This process must be executed on every platform where you want your application to run.  
-   Executables are platform-specific, so you'll need to build them separately for Linux, macOS, and Windows.
+Add the `-v` or `--verbose` argument to print a more detailed error message in case of problems.
 
 ## Gallery
 
-### Plot
+### Example output for Plot command
 
 ![Figure1](https://github.com/user-attachments/assets/3bfcfae2-c956-41bc-9c36-c3702a4fcfd2)
 
-### Diff
+### Example output for Diff command
 
 ![Figure2](https://github.com/user-attachments/assets/895514df-5591-44b3-8921-428b1d031f50)
