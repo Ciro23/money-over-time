@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 
 import pandas as pd
-import plotly.graph_objects as go # type: ignore
+import plotly.graph_objects as go
 
 from mot.types.cell import Cell
 from mot.types.date_cell import DateCell
