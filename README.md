@@ -16,7 +16,7 @@ as they can be later customized when using this program.
 
 Example records file:
 
-```
+```csv
 id,date,amount,account
 1,1/12/2023,10,cash
 2,2/12,2023,30,cash
@@ -28,8 +28,9 @@ id,date,amount,account
 ### How to run
 
 You can download and run the executables attached to each release in the [releases](https://github.com/Ciro23/money-over-time/releases)
-page or using the Python interpreter (refer to [Building from source](#building-from-source)).  
->In case of the executable running very slowly, it's recommended to run the script directly using Python.
+page or using the Python interpreter (refer to [Building from source](#building-from-source)).
+
+> In case of the executable running very slowly, it's recommended to run the script directly using Python.
 
 #### Case sensitiveness
 
@@ -37,7 +38,8 @@ When specifying the label of the date and amount column, the values are handled 
 
 #### Default arguments
 
-These are the default values used when their respective arguments are not specified:  
+These are the default values used when their respective arguments are not specified:
+
 - Cells delimiter: ",";
 - Date format: "%d/%m/%Y";  
 - Date label: "date";
@@ -55,6 +57,7 @@ To show the graph, use the `plot` command:
 mot plot --file "/path/to/your/csv/or/xlsx/file.csv"
 
 ```
+
 Optional arguments can be customized using:
 
 ```shell
@@ -66,6 +69,7 @@ mot plot \
     --amount-label "custom amount label"
 
 ```
+
 It's also possible to filter in or out some movements based on the value of a specific column.
 For example, if the records file contains a column named "account" and you want to filter out
 all the rows which account is "debit card", you can use:
@@ -143,6 +147,7 @@ versions should also be compatible, but warnings may be shown).
     python -m mot
 
     ```
+
 6. Run the unit tests with:
 
    ```shell
